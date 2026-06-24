@@ -695,10 +695,6 @@
 
         <div class="presenter-deck">
             <div class="presenter-title">Simulation Deck</div>
-            <button class="sim-btn" onclick="triggerShakeSimulation()">
-                <strong>⚡ Accelerometer Shake (3x)</strong>
-                <span>Simulate shaking phone thrice</span>
-            </button>
             <button class="sim-btn" onclick="triggerVoiceSimulation()">
                 <strong>🗣️ Mock Vocal Keyword Input</strong>
                 <span>Simulate speaking word "Help!"</span>
@@ -1111,15 +1107,6 @@
             stasisEvaluationLoop = setInterval(evaluateStasisMetrics, 1000);
             
             startContinuousSpeechRecognition();
-        }
-
-        function triggerShakeSimulation() {
-            appendLogMessage("Sensor Logic: Analyzing accelerometer delta matrices...");
-            setTimeout(() => appendLogMessage("Sensor Logic: Rapid vector threshold spike count (2/3)..."), 300);
-            setTimeout(() => {
-                appendLogMessage("Sensor Logic: Accelerometer gesture matching metrics achieved.");
-                fireEmergencyProtocol("3x Kinetic Acceleration Device Shake");
-            }, 600);
         }
 
         function triggerVoiceSimulation() {
