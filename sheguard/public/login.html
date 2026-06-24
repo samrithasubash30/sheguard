@@ -47,7 +47,6 @@
             margin-top: 5px; 
         }
 
-        /* Tab switcher */
         .tab-switcher {
             display: flex;
             background: #222226;
@@ -86,7 +85,7 @@
         
         .form-group input { 
             width: 100%; 
-            padding: 12px 16px; 
+            padding: 12px 45px 12px 16px; 
             background: #222226; 
             border: 1px solid #3A3A42; 
             border-radius: 8px; 
@@ -97,6 +96,41 @@
         
         .form-group input:focus { 
             border-color: #ff66b2; 
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 45px 12px 16px;
+            background: #222226;
+            border: 1px solid #3A3A42;
+            border-radius: 8px;
+            color: white;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .input-wrapper input:focus {
+            border-color: #ff66b2;
+        }
+
+        .eye-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            user-select: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .eye-toggle:hover {
+            opacity: 1;
         }
         
         .btn-submit { 
@@ -118,18 +152,6 @@
         
         .btn-submit:hover { 
             background: #431966; 
-        }
-
-        @media (max-width: 480px) {
-            .login-card {
-                padding: 30px 20px;
-                margin: 15px;
-                border-radius: 16px;
-            }
-            .logo-title h1 { font-size: 22px; }
-            .form-group input { font-size: 16px; padding: 14px 16px; }
-            .btn-submit { font-size: 15px; padding: 15px; }
-            .tab-btn { font-size: 13px; padding: 10px 5px; }
         }
 
         .error-msg {
@@ -156,6 +178,19 @@
 
         .panel { display: none; }
         .panel.active { display: block; }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 30px 20px;
+                margin: 15px;
+                border-radius: 16px;
+            }
+            .logo-title h1 { font-size: 22px; }
+            .input-wrapper input { font-size: 16px; }
+            .form-group input { font-size: 16px; }
+            .btn-submit { font-size: 15px; padding: 15px; }
+            .tab-btn { font-size: 13px; padding: 10px 5px; }
+        }
     </style>
 </head>
 <body>
@@ -180,7 +215,10 @@
             </div>
             <div class="form-group">
                 <label>Security Access Code</label>
-                <input type="password" id="password-input" placeholder="Your password">
+                <div class="input-wrapper">
+                    <input type="password" id="password-input" placeholder="Your password">
+                    <span class="eye-toggle" onclick="togglePassword('password-input', 'eye1')" id="eye1">👁️</span>
+                </div>
             </div>
             <button class="btn-submit" onclick="handleAuthenticationSubmission()">Verify Identity & Proceed</button>
         </div>
@@ -195,11 +233,17 @@
             </div>
             <div class="form-group">
                 <label>Password <span style="color:#666; font-size:11px;">(min. 6 characters)</span></label>
-                <input type="password" id="reg-password" placeholder="Create a strong password">
+                <div class="input-wrapper">
+                    <input type="password" id="reg-password" placeholder="Create a strong password">
+                    <span class="eye-toggle" onclick="togglePassword('reg-password', 'eye2')" id="eye2">👁️</span>
+                </div>
             </div>
             <div class="form-group">
                 <label>Confirm Password</label>
-                <input type="password" id="reg-confirm" placeholder="Repeat your password">
+                <div class="input-wrapper">
+                    <input type="password" id="reg-confirm" placeholder="Repeat your password">
+                    <span class="eye-toggle" onclick="togglePassword('reg-confirm', 'eye3')" id="eye3">👁️</span>
+                </div>
             </div>
             <button class="btn-submit" onclick="handleRegistration()">Create Account & Continue</button>
         </div>
@@ -211,6 +255,18 @@
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             document.getElementById('panel-' + tab).classList.add('active');
             event.target.classList.add('active');
+        }
+
+        function togglePassword(inputId, eyeId) {
+            const input = document.getElementById(inputId);
+            const eye = document.getElementById(eyeId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                eye.innerText = '🙈';
+            } else {
+                input.type = 'password';
+                eye.innerText = '👁️';
+            }
         }
 
         function showError(id, msg) {
@@ -281,7 +337,6 @@
                 if (result.success) {
                     localStorage.setItem('sheguard_userId', result.userId);
                     localStorage.setItem('sheguard_email', email);
-                    // Show success briefly then redirect
                     const s = document.getElementById('register-success');
                     s.innerText = 'Account created! Redirecting to profile setup...';
                     s.style.display = 'block';
@@ -294,7 +349,6 @@
             }
         }
 
-        // Allow Enter key to submit
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 const loginPanel = document.getElementById('panel-login');
