@@ -479,6 +479,178 @@
         .btn-close-modal:hover {
             background: #5c258d;
         }
+
+        /* ═══════════════════════════════════════
+           MOBILE RESPONSIVE — Full Fix
+        ═══════════════════════════════════════ */
+        @media (max-width: 768px) {
+
+            /* Body stacks vertically on mobile */
+            body {
+                flex-direction: column;
+                height: 100dvh;
+                overflow: hidden;
+            }
+
+            /* Hide sidebar on mobile — use bottom nav instead */
+            .sidebar {
+                display: none;
+            }
+
+            /* Mobile top bar */
+            .top-accent-bar {
+                height: 45px;
+                padding: 0 15px;
+            }
+
+            .system-status-pouch {
+                font-size: 11px;
+            }
+
+            /* Dashboard body full width */
+            .main-window {
+                width: 100%;
+                height: 100dvh;
+                flex: 1;
+            }
+
+            .dashboard-body {
+                padding: 15px 15px 10px 15px;
+                overflow-y: auto;
+                justify-content: flex-start;
+                gap: 12px;
+            }
+
+            /* Smaller header */
+            .emergency-header h2 {
+                font-size: 22px;
+                margin-bottom: 4px;
+            }
+
+            .emergency-header p {
+                font-size: 12px;
+            }
+
+            /* SOS button smaller on mobile */
+            .sos-ripple-outer {
+                width: 160px;
+                height: 160px;
+            }
+
+            .sos-ripple-middle {
+                width: 130px;
+                height: 130px;
+            }
+
+            .sos-button {
+                width: 105px;
+                height: 105px;
+                font-size: 22px;
+            }
+
+            .sos-container {
+                margin: 8px 0;
+            }
+
+            /* Cards: 2 columns on mobile */
+            .cards-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+
+            .card {
+                height: 150px;
+                padding: 12px;
+            }
+
+            .action-card h3 {
+                font-size: 13px;
+            }
+
+            .action-icon-placeholder {
+                font-size: 24px;
+                margin-bottom: 6px;
+                width: 36px;
+                height: 36px;
+            }
+
+            .action-card p {
+                font-size: 10px;
+            }
+
+            .panel-card h4 {
+                font-size: 12px;
+            }
+
+            .list-container-scroll {
+                height: 100px;
+            }
+
+            .item-info h5 {
+                font-size: 11px;
+            }
+
+            .item-info p {
+                font-size: 9px;
+            }
+
+            /* Bottom nav full width */
+            .bottom-nav {
+                width: 100%;
+                border-radius: 0;
+                height: 56px;
+                gap: 0;
+                justify-content: space-around;
+                margin: 0;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                z-index: 100;
+            }
+
+            .bottom-nav-item {
+                font-size: 9px;
+                flex: 1;
+                padding: 4px 0;
+            }
+
+            .bottom-icon-placeholder {
+                font-size: 18px;
+                margin-bottom: 2px;
+            }
+
+            /* Modal fix for mobile */
+            .modal-content {
+                margin: 15px;
+                padding: 20px;
+                max-width: calc(100vw - 30px);
+            }
+
+            .popup-msg-box {
+                font-size: 11px;
+                word-break: break-all;
+            }
+        }
+
+        /* Very small phones */
+        @media (max-width: 380px) {
+            .cards-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .card {
+                height: 130px;
+                padding: 10px;
+            }
+
+            .sos-ripple-outer { width: 140px; height: 140px; }
+            .sos-ripple-middle { width: 114px; height: 114px; }
+            .sos-button { width: 90px; height: 90px; font-size: 20px; }
+
+            .emergency-header h2 { font-size: 18px; }
+        }
     </style>
 </head>
 <body>

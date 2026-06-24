@@ -27,6 +27,17 @@
         .btn-back { color: #888; text-decoration: none; font-size: 14px; }
         .btn-finalize { background: #5c258d; color: white; border: none; padding: 14px 40px; border-radius: 25px; font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: none; box-shadow: 0 0 15px rgba(92,37,141,0.4); }
 
+        @media (max-width: 600px) {
+            body { padding: 20px 12px; }
+            .form-container { padding: 25px 18px; }
+            .grid-layout { grid-template-columns: 1fr; gap: 0; }
+            .field input { font-size: 16px; padding: 14px; }
+            .step-header h2 { font-size: 20px; }
+            .btn-wrapper { flex-direction: column; gap: 15px; align-items: stretch; }
+            .btn-finalize { text-align: center; padding: 16px; font-size: 14px; }
+            .btn-back { text-align: center; }
+        }
+
         .save-status {
             font-size: 13px;
             padding: 10px 16px;
