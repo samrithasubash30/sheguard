@@ -251,7 +251,7 @@ app.get('/api/user/:userId', async (req, res) => {
 
 // Serve all HTML pages from /public
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'splash.html'));
 });
 
 app.listen(PORT, () => {
