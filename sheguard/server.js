@@ -249,9 +249,13 @@ app.get('/api/user/:userId', async (req, res) => {
     }
 });
 
-// Serve all HTML pages from /public
-app.get('*', (req, res) => {
+// Serve splash as home, all other routes serve their own files
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'splash.html'));
+});
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.listen(PORT, () => {
