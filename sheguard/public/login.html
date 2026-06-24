@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeHer - Authentication Portal</title>
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Segoe UI', sans-serif; 
+        }
+        
+        body { 
+            background: radial-gradient(circle at center, #4A148C 0%, #121214 100%); 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            color: #fff; 
+        }
+        
+        .login-card { 
+            background: rgba(26, 26, 30, 0.95); 
+            padding: 45px 40px; 
+            border-radius: 20px; 
+            width: 100%; 
+            max-width: 420px; 
+            border: 1px solid #3A3A42; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6); 
+        }
+        
+        .logo-title { 
+            text-align: center; 
+            margin-bottom: 30px; 
+        }
+        
+        .logo-title h1 { 
+            color: #ff66b2; 
+            font-size: 28px; 
+        }
+        
+        .logo-title p { 
+            color: #888; 
+            font-size: 13px; 
+            margin-top: 5px; 
+        }
+
+        /* Tab switcher */
+        .tab-switcher {
+            display: flex;
+            background: #222226;
+            border-radius: 8px;
+            margin-bottom: 28px;
+            padding: 4px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: #888;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: #5c258d;
+            color: #fff;
+        }
+        
+        .form-group { 
+            margin-bottom: 22px; 
+        }
+        
+        .form-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            color: #BBB; 
+            font-size: 13px; 
+            font-weight: 500; 
+        }
+        
+        .form-group input { 
+            width: 100%; 
+            padding: 12px 16px; 
+            background: #222226; 
+            border: 1px solid #3A3A42; 
+            border-radius: 8px; 
+            color: white; 
+            font-size: 15px; 
+            outline: none; 
+        }
+        
+        .form-group input:focus { 
+            border-color: #ff66b2; 
+        }
+        
+        .btn-submit { 
+            width: 100%; 
+            padding: 14px; 
+            background: #5c258d; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: background 0.2s; 
+            margin-top: 10px; 
+            text-decoration: none; 
+            display: block; 
+            text-align: center; 
+        }
+        
+        .btn-submit:hover { 
+            background: #431966; 
+        }
+
+        .error-msg {
+            background: rgba(233, 30, 99, 0.15);
+            border: 1px solid #E91E63;
+            color: #ff66b2;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 18px;
+            display: none;
+        }
+
+        .success-msg {
+            background: rgba(76, 175, 80, 0.15);
+            border: 1px solid #4CAF50;
+            color: #4CAF50;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 18px;
+            display: none;
+        }
+
+        .panel { display: none; }
+        .panel.active { display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="logo-title">
+            <h1>SafeHer Authentication</h1>
+            <p>Secure System Verification Layer</p>
+        </div>
+
+        <div class="tab-switcher">
+            <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+            <button class="tab-btn" onclick="switchTab('register')">Create Account</button>
+        </div>
+
+        <!-- LOGIN PANEL -->
+        <div class="panel active" id="panel-login">
+            <div class="error-msg" id="login-error"></div>
+            <div class="form-group">
+                <label>User Account Identifier (Email)</label>
+                <input type="email" id="email-input" placeholder="name@domain.com">
+            </div>
+            <div class="form-group">
+                <label>Security Access Code</label>
+                <input type="password" id="password-input" placeholder="Your password">
+            </div>
+            <button class="btn-submit" onclick="handleAuthenticationSubmission()">Verify Identity & Proceed</button>
+        </div>
+
+        <!-- REGISTER PANEL -->
+        <div class="panel" id="panel-register">
+            <div class="error-msg" id="register-error"></div>
+            <div class="success-msg" id="register-success"></div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="reg-email" placeholder="name@domain.com">
+            </div>
+            <div class="form-group">
+                <label>Password <span style="color:#666; font-size:11px;">(min. 6 characters)</span></label>
+                <input type="password" id="reg-password" placeholder="Create a strong password">
+            </div>
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" id="reg-confirm" placeholder="Repeat your password">
+            </div>
+            <button class="btn-submit" onclick="handleRegistration()">Create Account & Continue</button>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-' + tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function showError(id, msg) {
+            const el = document.getElementById(id);
+            el.innerText = msg;
+            el.style.display = 'block';
+        }
+
+        function hideMessages(...ids) {
+            ids.forEach(id => { document.getElementById(id).style.display = 'none'; });
+        }
+
+        async function handleAuthenticationSubmission() {
+            hideMessages('login-error');
+            const emailField = document.getElementById('email-input').value.trim();
+            const passwordField = document.getElementById('password-input').value;
+
+            if (!emailField || !passwordField) {
+                return showError('login-error', 'Please enter your email and password.');
+            }
+
+            try {
+                const queryResponse = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: emailField, password: passwordField })
+                });
+
+                const dataFeedbackResult = await queryResponse.json();
+                
+                if (dataFeedbackResult.success) {
+                    localStorage.setItem('sheguard_userId', dataFeedbackResult.userId);
+                    localStorage.setItem('sheguard_email', dataFeedbackResult.email);
+                    window.location.href = 'profile-details.html';
+                } else {
+                    showError('login-error', dataFeedbackResult.message || 'Authentication rejected.');
+                }
+            } catch (error) {
+                showError('login-error', 'Connection error. Please try again.');
+            }
+        }
+
+        async function handleRegistration() {
+            hideMessages('register-error', 'register-success');
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const confirm = document.getElementById('reg-confirm').value;
+
+            if (!email || !password || !confirm) {
+                return showError('register-error', 'All fields are required.');
+            }
+            if (password !== confirm) {
+                return showError('register-error', 'Passwords do not match.');
+            }
+            if (password.length < 6) {
+                return showError('register-error', 'Password must be at least 6 characters.');
+            }
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    localStorage.setItem('sheguard_userId', result.userId);
+                    localStorage.setItem('sheguard_email', email);
+                    // Show success briefly then redirect
+                    const s = document.getElementById('register-success');
+                    s.innerText = 'Account created! Redirecting to profile setup...';
+                    s.style.display = 'block';
+                    setTimeout(() => { window.location.href = 'profile-details.html'; }, 1200);
+                } else {
+                    showError('register-error', result.message || 'Registration failed.');
+                }
+            } catch (error) {
+                showError('register-error', 'Connection error. Please try again.');
+            }
+        }
+
+        // Allow Enter key to submit
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const loginPanel = document.getElementById('panel-login');
+                const registerPanel = document.getElementById('panel-register');
+                if (loginPanel.classList.contains('active')) handleAuthenticationSubmission();
+                else if (registerPanel.classList.contains('active')) handleRegistration();
+            }
+        });
+    </script>
+
+</body>
+</html>

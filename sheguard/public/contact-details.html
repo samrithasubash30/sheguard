@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeHer Setup - Trusted Loop Configurations</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #121214; color: #F5F5F7; min-height: 100vh; padding: 40px 20px; }
+        .form-container { max-width: 750px; background: #1A1A1E; margin: 0 auto; border-radius: 16px; border: 1px solid #2A2A30; padding: 40px; }
+        .step-header { border-bottom: 1px solid #2A2A30; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .step-header h2 { font-size: 24px; color: #ff66b2; }
+        
+        .contact-entry-card { background: #222226; border: 1px solid #333; padding: 25px; border-radius: 12px; margin-bottom: 20px; position: relative; }
+        .card-num { font-size: 11px; text-transform: uppercase; color: #6A1B9A; font-weight: bold; margin-bottom: 15px; display: block; letter-spacing: 0.5px; }
+        
+        .grid-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .field { display: flex; flex-direction: column; margin-bottom: 15px; }
+        .field label { font-size: 13px; color: #BBB; margin-bottom: 6px; }
+        .field label.required::after { content: ' *'; color: #E91E63; }
+        .field input { padding: 12px; background: #1A1A1E; border: 1px solid #333; border-radius: 8px; color: white; font-size: 14px; outline: none; }
+        .field input:focus { border-color: #5c258d; }
+        
+        .add-row-btn { background: rgba(106, 27, 154, 0.2); border: 1px dashed #6A1B9A; color: #ff66b2; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; text-align: center; font-weight: 500; font-size: 14px; margin-bottom: 25px; }
+        
+        .btn-wrapper { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #2A2A30; padding-top: 25px; }
+        .btn-back { color: #888; text-decoration: none; font-size: 14px; }
+        .btn-finalize { background: #5c258d; color: white; border: none; padding: 14px 40px; border-radius: 25px; font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: none; box-shadow: 0 0 15px rgba(92,37,141,0.4); }
+
+        .save-status {
+            font-size: 13px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .save-status.error { background: rgba(233,30,99,0.15); border: 1px solid #E91E63; color: #ff66b2; }
+        .save-status.success { background: rgba(76,175,80,0.15); border: 1px solid #4CAF50; color: #4CAF50; }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <div class="step-header">
+            <div>
+                <h2>Step 2: Trusted Safety Circle Mapping</h2>
+                <p style="font-size: 13px; color: #888; margin-top: 5px;">Configure target notification routes (Supports multi-channel 3-5 loops assignment)</p>
+            </div>
+        </div>
+
+        <div class="save-status" id="save-status"></div>
+
+        <div id="contacts-wrapper"></div>
+
+        <button type="button" class="add-row-btn" onclick="addNewContactCard()">✚ Map Additional Contact Matrix Node (Scale Loop Pool up to 5)</button>
+
+        <div class="btn-wrapper">
+            <a href="profile-details.html" class="btn-back">◀ Re-evaluate Step 1 Metrics</a>
+            <button class="btn-finalize" onclick="saveAndFinalize()">Compile Profile Data & Launch App Deck ⚡</button>
+        </div>
+    </div>
+
+    <script>
+        // Guard: redirect to login if no session
+        const userId = localStorage.getItem('sheguard_userId');
+        if (!userId) { window.location.href = 'login.html'; }
+
+        let contactCount = 0;
+
+        function createContactCard(num, data = {}) {
+            const card = document.createElement('div');
+            card.className = 'contact-entry-card';
+            card.innerHTML = `
+                <span class="card-num">Target Node Vector #${num}</span>
+                <div class="grid-layout">
+                    <div class="field">
+                        <label class="required">Emergency Contact Name</label>
+                        <input type="text" class="c-name" placeholder="Name identifying guardian..." value="${data.name || ''}">
+                    </div>
+                    <div class="field">
+                        <label>Relationship Status Mapping</label>
+                        <input type="text" class="c-rel" placeholder="e.g. Mother, Father, Friend..." value="${data.relationship || ''}">
+                    </div>
+                    <div class="field">
+                        <label class="required">Emergency Contact Mobile Matrix (SMS/Call Target)</label>
+                        <input type="tel" class="c-phone" placeholder="Phone number string payload..." value="${data.phone || ''}">
+                    </div>
+                    <div class="field">
+                        <label>Alternative Backup Contact Link</label>
+                        <input type="tel" class="c-backup" placeholder="Secondary backup routing lane..." value="${data.backup_phone || ''}">
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        function addNewContactCard(data = {}) {
+            if (contactCount >= 5) {
+                alert("Maximum algorithmic boundary threshold reached (5 Node Channels Active).");
+                return;
+            }
+            contactCount++;
+            const wrapper = document.getElementById('contacts-wrapper');
+            wrapper.appendChild(createContactCard(contactCount, data));
+        }
+
+        // Pre-fill existing contacts from database
+        async function loadExistingContacts() {
+            try {
+                const response = await fetch(`/api/dashboard/data/${userId}`);
+                const result = await response.json();
+                if (result.success && result.contacts.length > 0) {
+                    result.contacts.forEach(c => addNewContactCard(c));
+                } else {
+                    addNewContactCard(); // Start with one blank card
+                }
+            } catch (err) {
+                addNewContactCard(); // Start with one blank card on error
+            }
+        }
+
+        loadExistingContacts();
+
+        function showStatus(type, msg) {
+            const el = document.getElementById('save-status');
+            el.className = 'save-status ' + type;
+            el.innerText = msg;
+            el.style.display = 'block';
+        }
+
+        async function saveAndFinalize() {
+            const cards = document.querySelectorAll('.contact-entry-card');
+            const dynamicContactsPool = [];
+
+            cards.forEach(card => {
+                const name = card.querySelector('.c-name').value.trim();
+                const relationship = card.querySelector('.c-rel').value.trim();
+                const phone = card.querySelector('.c-phone').value.trim();
+                const backup_phone = card.querySelector('.c-backup').value.trim();
+                dynamicContactsPool.push({ name, relationship, phone, backup_phone });
+            });
+
+            const validContacts = dynamicContactsPool.filter(c => c.name && c.phone);
+            if (validContacts.length === 0) {
+                return showStatus('error', 'Please add at least one contact with a name and phone number.');
+            }
+
+            try {
+                const response = await fetch('/api/contacts/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: userId,
+                        contactsList: dynamicContactsPool
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showStatus('success', `${validContacts.length} contacts saved! Launching dashboard...`);
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 900);
+                } else {
+                    showStatus('error', result.message || 'Failed to save contacts.');
+                }
+            } catch (err) {
+                showStatus('error', 'Connection error. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>

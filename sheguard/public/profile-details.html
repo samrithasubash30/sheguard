@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeHer Setup - Personal Profile Context</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #121214; color: #F5F5F7; min-height: 100vh; padding: 40px 20px; }
+        .form-container { max-width: 650px; background: #1A1A1E; margin: 0 auto; border-radius: 16px; border: 1px solid #2A2A30; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+        .step-header { border-bottom: 1px solid #2A2A30; padding-bottom: 20px; margin-bottom: 30px; }
+        .step-header h2 { font-size: 24px; color: #ff66b2; }
+        .step-header p { font-size: 14px; color: #888; margin-top: 5px; }
+        
+        .grid-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .form-field { display: flex; flex-direction: column; margin-bottom: 20px; }
+        .form-field.full-width { grid-column: span 2; }
+        .form-field label { font-size: 13px; color: #BBB; margin-bottom: 8px; font-weight: 500; }
+        .form-field label span { font-size: 11px; color: #666; font-style: italic; margin-left: 5px; }
+        
+        .form-field input, .form-field select { padding: 12px; background: #222226; border: 1px solid #333; border-radius: 8px; color: white; font-size: 14px; outline: none; }
+        .form-field input:focus, .form-field select:focus { border-color: #5c258d; }
+        
+        .btn-wrapper { display: flex; justify-content: flex-end; margin-top: 20px; border-top: 1px solid #2A2A30; padding-top: 25px; }
+        .btn-next { background: linear-gradient(45deg, #5c258d, #ff66b2); color: white; border: none; padding: 12px 35px; border-radius: 25px; font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: none; }
+
+        .save-status {
+            font-size: 13px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .save-status.error { background: rgba(233,30,99,0.15); border: 1px solid #E91E63; color: #ff66b2; }
+        .save-status.success { background: rgba(76,175,80,0.15); border: 1px solid #4CAF50; color: #4CAF50; }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <div class="step-header">
+            <h2>Step 1: Personalization Metrics</h2>
+            <p>Configure device internal profile values (All values configuration layer mapping)</p>
+        </div>
+
+        <div class="save-status" id="save-status"></div>
+        
+        <form id="metrics-form">
+            <div class="form-field full-width">
+                <label>Profile Identifier Asset <span>(Optional)</span></label>
+                <input type="file" accept="image/*">
+            </div>
+
+            <div class="grid-row">
+                <div class="form-field">
+                    <label>Date of Birth <span>(Optional)</span></label>
+                    <input type="date" id="dob">
+                </div>
+                <div class="form-field">
+                    <label>Gender <span>(Optional)</span></label>
+                    <select id="gender">
+                        <option value="Female" selected>Female (Default Option)</option>
+                        <option value="Male">Male</option>
+                        <option value="Other">Custom Orientation Vector</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-field">
+                <label>Blood Classification Metric <span>(Optional - Highly Recommended for Medical Dispatch)</span></label>
+                <select id="blood-type">
+                    <option value="">Select blood type structural configuration...</option>
+                    <option value="O+">O Positive (O+)</option>
+                    <option value="A+">A Positive (A+)</option>
+                    <option value="B+">B Positive (B+)</option>
+                    <option value="AB+">AB Positive (AB+)</option>
+                    <option value="O-">O Negative (O-)</option>
+                    <option value="A-">A Negative (A-)</option>
+                    <option value="B-">B Negative (B-)</option>
+                    <option value="AB-">AB Negative (AB-)</option>
+                </select>
+            </div>
+
+            <div class="form-field full-width">
+                <label>Residential Fixed Baseline Address <span>(Optional)</span></label>
+                <input type="text" id="address" placeholder="House/Flat No, Street Node Details...">
+            </div>
+
+            <div class="grid-row">
+                <div class="form-field">
+                    <label>City Matrix Name <span>(Optional)</span></label>
+                    <input type="text" id="city" placeholder="e.g. Chennai">
+                </div>
+                <div class="form-field">
+                    <label>State / Region <span>(Optional)</span></label>
+                    <input type="text" id="state" placeholder="e.g. Tamil Nadu">
+                </div>
+            </div>
+
+            <div class="btn-wrapper">
+                <button type="submit" class="btn-next">Save & Advance Vector Elements ➔</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Guard: redirect to login if no session
+        const userId = localStorage.getItem('sheguard_userId');
+        if (!userId) { window.location.href = 'login.html'; }
+
+        // Pre-fill form with existing profile data from database
+        async function loadExistingProfile() {
+            try {
+                const response = await fetch(`/api/profile/${userId}`);
+                const result = await response.json();
+                if (result.success && result.profile) {
+                    const p = result.profile;
+                    if (p.dob) document.getElementById('dob').value = p.dob;
+                    if (p.gender) document.getElementById('gender').value = p.gender;
+                    if (p.blood_type) document.getElementById('blood-type').value = p.blood_type;
+                    if (p.address) document.getElementById('address').value = p.address;
+                    if (p.city) document.getElementById('city').value = p.city;
+                    if (p.state) document.getElementById('state').value = p.state;
+                }
+            } catch (err) {
+                // Silent fail — form stays blank
+            }
+        }
+
+        loadExistingProfile();
+
+        function showStatus(type, msg) {
+            const el = document.getElementById('save-status');
+            el.className = 'save-status ' + type;
+            el.innerText = msg;
+            el.style.display = 'block';
+        }
+
+        document.getElementById('metrics-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const payloadFields = {
+                userId: userId,
+                dob: document.getElementById('dob').value,
+                gender: document.getElementById('gender').value,
+                bloodType: document.getElementById('blood-type').value,
+                address: document.getElementById('address').value,
+                city: document.getElementById('city').value,
+                state: document.getElementById('state').value
+            };
+
+            try {
+                const response = await fetch('/api/profile/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payloadFields)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus('success', 'Profile saved! Redirecting to contact setup...');
+                    setTimeout(() => { window.location.href = 'contact-details.html'; }, 900);
+                } else {
+                    showStatus('error', result.message || 'Error saving profile.');
+                }
+            } catch (err) {
+                showStatus('error', 'Connection error. Make sure the server is running.');
+            }
+        });
+    </script>
+</body>
+</html>

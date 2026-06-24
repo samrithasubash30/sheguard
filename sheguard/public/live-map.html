@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SheGuard - Live Tracking Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { display: flex; flex-direction: column; height: 100vh; background-color: #f7f5fa; }
+        .map-header {
+            background-color: #3b1654;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        .btn-back {
+            background-color: #7a358c;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn-back:hover { background-color: #5c258d; }
+        #map { flex: 1; width: 100%; z-index: 1; }
+        .telemetry-status-overlay {
+            position: absolute;
+            bottom: 25px;
+            left: 25px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.15);
+            z-index: 1000;
+            border-left: 5px solid #7a358c;
+        }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #4CAF50;
+            margin-bottom: 5px;
+        }
+        .pulse-dot { width: 8px; height: 8px; background-color: #4CAF50; border-radius: 50%; }
+    </style>
+</head>
+<body>
+    <header class="map-header">
+        <div>
+            <h2 style="font-size: 18px; font-weight: 600;">📍 Real-Time Spatial Router Layer</h2>
+            <p style="font-size: 11px; color: #bfa3d4;">Continuous GPS Road Network Tracking</p>
+        </div>
+        <a href="dashboard.html" class="btn-back">◀ Return to Dashboard</a>
+    </header>
+
+    <div id="map"></div>
+
+    <div class="telemetry-status-overlay">
+        <div class="status-pill"><div class="pulse-dot"></div> Active GPS Feed</div>
+        <p id="coordinates-text" style="font-size: 14px; font-weight: bold; color: #333;">Locating device telemetry...</p>
+        <p style="font-size: 11px; color: #777; margin-top: 2px;">Map engine: OpenStreetMap Road Layer Grid</p>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let map;
+        let deviceMarker;
+        let accuracyCircle;
+        let trackingInitialized = false;
+
+        function initializeLiveMapEngine(lat, lon) {
+            map = L.map('map').setView([lat, lon], 16);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            deviceMarker = L.marker([lat, lon]).addTo(map)
+                .bindPopup('<b>Your Current Location</b><br>Active SheGuard Protection Node.').openPopup();
+            accuracyCircle = L.circle([lat, lon], {
+                color: '#7a358c',
+                fillColor: '#bfa3d4',
+                fillOpacity: 0.3,
+                radius: 100
+            }).addTo(map);
+            trackingInitialized = true;
+        }
+
+        function syncBrowserPosition() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    document.getElementById('coordinates-text').innerText = `${lat.toFixed(5)}° N, ${lon.toFixed(5)}° E`;
+                    if (!trackingInitialized) {
+                        initializeLiveMapEngine(lat, lon);
+                    } else {
+                        const targetLatLng = new L.LatLng(lat, lon);
+                        deviceMarker.setLatLng(targetLatLng);
+                        accuracyCircle.setLatLng(targetLatLng);
+                        map.panTo(targetLatLng);
+                    }
+                }, () => {
+                    const fallbackLat = 13.0827;
+                    const fallbackLon = 80.2707;
+                    document.getElementById('coordinates-text').innerText = `${fallbackLat}° N, ${fallbackLon}° E (Fallback - Chennai)`;
+                    if (!trackingInitialized) initializeLiveMapEngine(fallbackLat, fallbackLon);
+                }, { enableHighAccuracy: true });
+            }
+        }
+
+        window.onload = syncBrowserPosition;
+    </script>
+</body>
+</html>

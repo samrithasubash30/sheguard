@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHEGUARD - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            background-color: #f7f5fa;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR STYLING --- */
+        .sidebar {
+            width: 250px;
+            background-color: #1a1f24;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 0 15px 0;
+            color: #a0a5b0;
+            border-right: 1px solid #15191c;
+            justify-content: space-between;
+        }
+
+        .brand-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 0 20px;
+        }
+
+        .brand-logo-placeholder {
+            width: 65px;
+            height: 65px;
+            background-color: transparent;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .brand-name {
+            color: #d1b3ff;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .menu-list {
+            list-style: none;
+            width: 100%;
+        }
+
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            color: #9299a6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            gap: 15px;
+        }
+
+        .menu-item.active a {
+            color: #ffffff;
+            background-color: #232931;
+            border-left: 4px solid #7a358c;
+        }
+
+        .menu-item a:hover {
+            color: #ffffff;
+            background-color: #232931;
+        }
+
+        .menu-icon-placeholder {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+        }
+
+        /* Presenter Controls Sidebar Box */
+        .presenter-deck {
+            margin-top: auto;
+            border-top: 1px solid #2d353f;
+            padding: 15px 20px 0 20px;
+        }
+        .presenter-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #5c6270;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .sim-btn {
+            width: 100%;
+            background: #232931;
+            border: 1px solid #2d353f;
+            padding: 10px 12px;
+            border-radius: 6px;
+            text-align: left;
+            color: #fff;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 11px;
+            transition: 0.2s;
+        }
+        .sim-btn:hover {
+            background: #2c343e;
+            border-color: #7a358c;
+        }
+        .sim-btn strong {
+            display: block;
+            color: #ff66b2;
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+
+        /* --- MAIN CONTENT WINDOW --- */
+        .main-window {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+            position: relative;
+        }
+
+        .top-accent-bar {
+            height: 35px;
+            background-color: #6a1b9a;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .system-status-pouch {
+            font-size: 12px;
+            color: #ffffff;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot-pulse {
+            width: 8px;
+            height: 8px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+        }
+
+        .status-dot-pulse.alerted {
+            background-color: #ff66b2;
+        }
+
+        .profile-pic-placeholder {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            border: 1px solid #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+        }
+
+        /* Dashboard Workspace */
+        .dashboard-body {
+            flex: 1;
+            padding: 30px 40px 15px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            overflow-y: auto;
+        }
+
+        .emergency-header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .emergency-header h2 {
+            color: #3b1654;
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .emergency-header p {
+            color: #555555;
+            font-size: 14px;
+        }
+
+        /* Massive SOS Button Layout */
+        .sos-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .sos-ripple-outer {
+            width: 190px;
+            height: 190px;
+            background-color: rgba(122, 53, 140, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sos-ripple-middle {
+            width: 160px;
+            height: 160px;
+            background-color: rgba(122, 53, 140, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sos-button {
+            width: 130px;
+            height: 130px;
+            background-color: #7a358c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 26px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(122, 53, 140, 0.4);
+            cursor: pointer;
+            user-select: none;
+            transition: 0.2s;
+        }
+        .sos-button:active {
+            transform: scale(0.96);
+        }
+
+        /* Grid Cards Section */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 1.1fr 1.4fr 1.4fr;
+            gap: 15px;
+            width: 100%;
+            max-width: 1100px;
+            margin-top: auto;
+            margin-bottom: 15px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 15px 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f0f0f2;
+            height: 185px;
+            overflow: hidden;
+        }
+
+        .action-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            transition: border 0.2s, transform 0.2s;
+        }
+        .action-card:hover {
+            border-color: #7a358c;
+            transform: translateY(-2px);
+        }
+
+        .action-icon-placeholder {
+            width: 50px;
+            height: 50px;
+            background-color: transparent;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .action-card h3 {
+            color: #333333;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .action-card p {
+            font-size: 12px;
+            color: #666;
+            word-break: break-all;
+            padding: 0 5px;
+        }
+
+        .panel-card h4 {
+            color: #333333;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #f5f5f7;
+            padding-bottom: 5px;
+        }
+
+        .list-container-scroll {
+            height: 130px;
+            overflow-y: auto;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #f9f9fa;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-left-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar-placeholder {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #e5e5e7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .item-info h5 {
+            color: #444444;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .item-info p {
+            color: #888888;
+            font-size: 10px;
+        }
+
+        .action-shortcut-icons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .mini-icon-btn-placeholder {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background-color: #f1e6f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+        }
+
+        .timestamp {
+            color: #999999;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
+        /* --- BOTTOM CONTROL NAV BAR --- */
+        .bottom-nav {
+            height: 50px;
+            background-color: #3b1654;
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            width: calc(100% - 40px);
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #bfa3d4;
+            text-decoration: none;
+            font-size: 10px;
+        }
+
+        .bottom-nav-item.active {
+            color: #ffffff;
+        }
+
+        .bottom-icon-placeholder {
+            width: 18px;
+            height: 18px;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        /* --- MODAL POP-UPS --- */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #ffffff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 480px;
+            padding: 30px;
+            border-top: 6px solid #7a358c;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .popup-msg-box {
+            background: #f4f5f7;
+            border-left: 4px solid #7a358c;
+            border-radius: 4px;
+            padding: 12px;
+            text-align: left;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 12px;
+            color: #232931;
+        }
+        .btn-close-modal {
+            background: #3b1654;
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .btn-close-modal:hover {
+            background: #5c258d;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="emergency-siren" src="siren.mp3" loop preload="auto"></audio>
+
+    <div id="init-interaction-modal" class="modal" style="display: flex;">
+        <div class="modal-content" style="border-top-color: #6a1b9a;">
+            <h2 style="color:#3b1654; font-size: 22px; margin-bottom: 10px;">Security Verification Required</h2>
+            <p style="color:#555; font-size: 14px; margin-bottom: 15px;">Initialize the SheGuard client environment hooks, speech algorithms, and device audio pipelines now.</p>
+            <button class="btn-close-modal" style="background: #7a358c; width: 100%; margin-top: 5px; padding: 14px;" onclick="bootDashboardPipeline()">Initialize Monitoring System</button>
+        </div>
+    </div>
+
+    <aside class="sidebar">
+        <div class="brand-container">
+            <div class="brand-logo-placeholder">🛡️</div>
+            <div class="brand-name">SheGuard</div>
+        </div>
+        <ul class="menu-list">
+            <li class="menu-item active">
+                <a href="#">
+                    <span class="menu-icon-placeholder">🏠</span> Home
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="contact-details.html">
+                    <span class="menu-icon-placeholder">👥</span> Contacts
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="profile-details.html">
+                    <span class="menu-icon-placeholder">👤</span> Profile
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#" onclick="handleLogout()">
+                    <span class="menu-icon-placeholder">🚪</span> Log Out
+                </a>
+            </li>
+        </ul>
+
+        <div class="presenter-deck">
+            <div class="presenter-title">Simulation Deck</div>
+            <button class="sim-btn" onclick="triggerShakeSimulation()">
+                <strong>⚡ Accelerometer Shake (3x)</strong>
+                <span>Simulate shaking phone thrice</span>
+            </button>
+            <button class="sim-btn" onclick="triggerVoiceSimulation()">
+                <strong>🗣️ Mock Vocal Keyword Input</strong>
+                <span>Simulate speaking word "Help!"</span>
+            </button>
+            <button class="sim-btn" onclick="simulateStasisEvent()">
+                <strong>📍 Force 30s Stasis Alert</strong>
+                <span>Force zero-movement stasis alarm</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="main-window">
+        <div class="top-accent-bar">
+            <div class="system-status-pouch">
+                <div class="status-dot-pulse" id="status-signal-dot"></div>
+                <span id="status-signal-text">AI Guard: Awaiting Activation</span>
+            </div>
+            <div class="profile-pic-placeholder" title="" id="user-avatar-box">👩</div>
+        </div>
+
+        <div class="dashboard-body">
+            <div class="emergency-header">
+                <h2>Are you in emergency ?</h2>
+                <p>Press the SOS button below and help will reach you shortly.</p>
+            </div>
+
+            <div class="sos-container">
+                <div class="sos-ripple-outer">
+                    <div class="sos-ripple-middle">
+                        <div class="sos-button" onclick="fireEmergencyProtocol('Manual Screen SOS Interface Intervention')">SOS</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                
+                <div class="card action-card" onclick="startContinuousSpeechRecognition()">
+                    <div class="action-icon-placeholder">📞</div>
+                    <h3>Audio Core State</h3>
+                    <p id="audio-state-text" style="color:#888; font-weight:500;">Awaiting alignment...</p>
+                </div>
+
+                <div class="card action-card" onclick="window.location.href='live-map.html'">
+                    <div class="action-icon-placeholder">📍</div>
+                    <h3>Live Coordinates</h3>
+                    <p id="telemetry-coordinates-box" style="font-weight: 600; color: #7a358c;">Locating...</p>
+                    <p style="font-size: 10px; color: #999; margin-top: 4px;">Click to track on roads map</p>
+                </div>
+
+                <div class="card panel-card">
+                    <h4>Safe Circle</h4>
+                    <div class="list-container-scroll" id="safe-circle-list">
+                        <div style="color:#aaa; font-size:12px; text-align:center; margin-top:40px;">Loading contacts...</div>
+                    </div>
+                </div>
+
+                <div class="card panel-card">
+                    <h4>Execution Stream Logs</h4>
+                    <div class="list-container-scroll" id="terminal-stream-box" style="font-family:monospace; font-size:11px; color:#333; line-height:1.4; padding-right: 5px;">
+                        [SYSTEM] Frame offline. Click initialization prompt banner...
+                    </div>
+                </div>
+
+            </div>
+
+            <nav class="bottom-nav">
+                <a href="#" class="bottom-nav-item active"><div class="bottom-icon-placeholder">🏠</div>Home</a>
+                <a href="#" class="bottom-nav-item" onclick="fireEmergencyProtocol('Forced Hotkey Navigation Assert')"><div class="bottom-icon-placeholder">⚠️</div>Emergency</a>
+                <a href="#" class="bottom-nav-item" onclick="alert('Presentation Note: Informative safety tips layer compiled.')"><div class="bottom-icon-placeholder">💡</div>Tips</a>
+                <a href="live-map.html" class="bottom-nav-item"><div class="bottom-icon-placeholder">⭕</div>Location Map</a>
+            </nav>
+        </div>
+    </main>
+
+    <div id="stasis-warning-modal" class="modal">
+        <div class="modal-content" style="border-top-color: #FFC107;">
+            <h2 id="threat-modal-title" style="color:#6a1b9a; font-size:22px;">⚠️ Dynamic Threat Flagged</h2>
+            <p id="threat-modal-desc" style="margin:12px 0; color:#555; font-size:14px;">Anomalous threshold pattern registered. Emergency sound loop initialized. Tap Stop below to halt automatic contact calling pipelines.</p>
+            <div id="countdown-ticker" style="font-size:38px; font-weight:bold; color:#7a358c; margin:10px 0;">10</div>
+            <button class="btn-close-modal" style="background:#e91e63;" onclick="dismissEmergencySystem()">STOP // False Alarm</button>
+        </div>
+    </div>
+
+    <div id="emergency-alert-modal" class="modal">
+        <div class="modal-content" id="alert-border-style" style="border-top-color:#ff66b2;">
+            <h2 id="dynamic-alert-headline" style="font-size:24px; color:#3b1654;">🚨 Emergency Protocol Armed</h2>
+            <p id="alert-reason-box" style="color:#777; font-size:12px; margin-top:4px; font-style:italic; margin-bottom: 10px;"></p>
+            
+            <div class="popup-msg-box">
+                <strong style="color:#7a358c;">[POP-UP SMS PAYLOAD DISPATCHED]</strong><br>
+                To Verified Guardians Circle: <span id="dynamic-sms-payload-text" style="color: #232931; font-family: sans-serif; display:block; margin-top:5px; font-weight:500;">Scanning...</span>
+            </div>
+
+            <div class="popup-msg-box" style="border-left-color: #2196F3;">
+                <strong style="color:#2196F3;">[POP-UP BACKGROUND CALL BRIDGE]</strong><br>
+                <span id="dynamic-call-payload-text">Establishing direct background cellular calling trunk channels...</span>
+            </div>
+
+            <button class="btn-close-modal" style="background:linear-gradient(to right, #7b2cbf, #ff66b2);" onclick="dismissEmergencySystem()">Reset Pipeline State</button>
+        </div>
+    </div>
+
+    <script>
+        // Guard: redirect to login if no session
+        const userId = localStorage.getItem('sheguard_userId');
+        if (!userId) { window.location.href = 'login.html'; }
+
+        let counterClock;
+        let stasisEvaluationLoop;
+        let lastKnownLat = null;
+        let lastKnownLon = null;
+        let stationarySecondsCount = 0;
+        let isEmergencyTriggered = false;
+        let speechRecognitionEngine = null;
+
+        function appendLogMessage(msg) {
+            const displayBox = document.getElementById('terminal-stream-box');
+            const stamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+            displayBox.innerHTML += `<br>[${stamp}] ${msg}`;
+            displayBox.scrollTop = displayBox.scrollHeight;
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('sheguard_userId');
+            localStorage.removeItem('sheguard_email');
+            window.location.href = 'index.html';
+        }
+
+        // ── LOAD REAL CONTACTS FROM DATABASE ──────────────────────────────────
+        async function loadSafetyCircleFromDatabase() {
+            try {
+                const response = await fetch(`/api/dashboard/data/${userId}`);
+                const result = await response.json();
+                const listEl = document.getElementById('safe-circle-list');
+
+                if (result.success && result.contacts.length > 0) {
+                    listEl.innerHTML = '';
+                    result.contacts.forEach(c => {
+                        const emoji = ['🧑','👩','🧔','👨','🛡️'][Math.floor(Math.random() * 5)];
+                        listEl.innerHTML += `
+                            <div class="list-item">
+                                <div class="item-left-profile">
+                                    <div class="avatar-placeholder">${emoji}</div>
+                                    <div class="item-info">
+                                        <h5>${c.name}${c.relationship ? ' (' + c.relationship + ')' : ''}</h5>
+                                        <p>${c.phone}</p>
+                                    </div>
+                                </div>
+                                <div class="action-shortcut-icons">
+                                    <div class="mini-icon-btn-placeholder" title="Call ${c.name}">📞</div>
+                                    <div class="mini-icon-btn-placeholder" title="Message ${c.name}">💬</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    appendLogMessage(`[SERVER SYNC]: Loaded ${result.contacts.length} verified contacts from database.`);
+                } else {
+                    listEl.innerHTML = '<div style="color:#aaa; font-size:12px; text-align:center; margin-top:30px; padding:0 10px;">No contacts saved yet.<br><a href="contact-details.html" style="color:#ff66b2;">Add contacts →</a></div>';
+                    appendLogMessage('[SERVER SYNC]: No contacts found in database for this user.');
+                }
+            } catch (err) {
+                appendLogMessage('[SERVER ERROR]: Failed to load contacts from database.');
+            }
+        }
+
+        // BROWSER INTERACTION BOOT LAYER
+        async function bootDashboardPipeline() {
+            document.getElementById('init-interaction-modal').style.display = 'none';
+            
+            document.getElementById('status-signal-text').innerText = "AI Guard: Active & Monitoring";
+            document.getElementById('audio-state-text').innerText = "Listening for vocal anchors";
+            document.getElementById('audio-state-text').style.color = "#4CAF50";
+            
+            const displayBox = document.getElementById('terminal-stream-box');
+            displayBox.innerHTML = "[SYSTEM] Initial frameworks bound.<br>[SYSTEM] Interaction established. Audio stream tokens unlocked.";
+            
+            // Load real contacts from DB inside boot sequence
+            await loadSafetyCircleFromDatabase();
+
+            requestDeviceGeolocation();
+            startContinuousSpeechRecognition();
+        }
+
+        // CONTINUOUS LIVE SPEECH RECOGNITION (WEB SPEECH RECOGNITION HOOKS)
+        function startContinuousSpeechRecognition() {
+            window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!window.SpeechRecognition) {
+                appendLogMessage("Acoustic Error: Speech Recognition API not supported natively on this browser context.");
+                document.getElementById('audio-state-text').innerText = "Microphone Module Error";
+                document.getElementById('audio-state-text').style.color = "#e91e63";
+                return;
+            }
+
+            speechRecognitionEngine = new window.SpeechRecognition();
+            speechRecognitionEngine.continuous = true;
+            speechRecognitionEngine.interimResults = false;
+            speechRecognitionEngine.lang = 'en-US';
+
+            speechRecognitionEngine.onstart = function() {
+                appendLogMessage("Acoustic NLP: Continuous voice framework stream initialized.");
+            };
+
+            speechRecognitionEngine.onerror = function(event) {
+                if (event.error === 'not-allowed') {
+                    appendLogMessage("Acoustic Warning: Microphone peripheral sandboxed. Enable mic popup toggle.");
+                }
+            };
+
+            speechRecognitionEngine.onend = function() {
+                if (!isEmergencyTriggered) {
+                    speechRecognitionEngine.start();
+                }
+            };
+
+            speechRecognitionEngine.onresult = function(event) {
+                const latestTranscriptResult = event.results[event.results.length - 1][0].transcript.toLowerCase().trim();
+                appendLogMessage(`Audio Core: Logged phrase data chunk -> "${latestTranscriptResult}"`);
+
+                if (latestTranscriptResult.includes("help") || latestTranscriptResult.includes("stop")) {
+                    appendLogMessage(`Acoustic NLP: Structural keyword intercept match -> "${latestTranscriptResult.toUpperCase()}"`);
+                    executeThreatVocalEscalation(latestTranscriptResult.toUpperCase());
+                }
+            };
+
+            try {
+                speechRecognitionEngine.start();
+            } catch (e) {}
+        }
+
+        function executeThreatVocalEscalation(matchedPhrase) {
+            if (isEmergencyTriggered) return;
+
+            const siren = document.getElementById('emergency-siren');
+            siren.play().catch(e => console.log("Audio pipeline stream blocked."));
+
+            document.getElementById('threat-modal-title').innerText = `🗣️ Vocal Threat Flagged: "${matchedPhrase}"`;
+            document.getElementById('threat-modal-desc').innerText = `Captured anchor word via system mic matrix. Siren audio executed. Tap Stop to prevent cascading emergency dispatch calling lines.`;
+            document.getElementById('stasis-warning-modal').style.display = 'flex';
+
+            let gracePeriodSeconds = 10;
+            document.getElementById('countdown-ticker').innerText = gracePeriodSeconds;
+
+            if (counterClock) clearInterval(counterClock);
+            counterClock = setInterval(() => {
+                gracePeriodSeconds--;
+                document.getElementById('countdown-ticker').innerText = gracePeriodSeconds;
+                appendLogMessage(`AI Guard: Vocal alarm grace loop step -> ${gracePeriodSeconds}s left...`);
+
+                if (gracePeriodSeconds <= 0) {
+                    clearInterval(counterClock);
+                    document.getElementById('stasis-warning-modal').style.display = 'none';
+                    fireEmergencyProtocol(`Unreturned Response to Vocal Distress Intercept ("${matchedPhrase}")`);
+                }
+            }, 1000);
+        }
+
+        // GEOLOCATION CONTROLLER
+        function requestDeviceGeolocation() {
+            if (navigator.geolocation) {
+                appendLogMessage("GPS Core: Requesting coordinate permissions...");
+                
+                navigator.geolocation.watchPosition(position => {
+                    const lat = position.coords.latitude.toFixed(4);
+                    const lon = position.coords.longitude.toFixed(4);
+                    
+                    document.getElementById('telemetry-coordinates-box').innerText = `${lat}° N, ${lon}° E`;
+                    
+                    if (lat === lastKnownLat && lon === lastKnownLon) {
+                        // Position identical
+                    } else {
+                        if(lastKnownLat !== null) {
+                            appendLogMessage("GPS Core: Position vector displacement registered. Resetting loop variables.");
+                        }
+                        lastKnownLat = lat;
+                        lastKnownLon = lon;
+                        stationarySecondsCount = 0;
+                    }
+                }, (error) => {
+                    document.getElementById('telemetry-coordinates-box').innerText = "13.0827° N, 80.2707° E";
+                    lastKnownLat = "13.0827";
+                    lastKnownLon = "80.2707";
+                    appendLogMessage("GPS Warning: True coordinates sandboxed. Loaded baseline maps configurations.");
+                }, { enableHighAccuracy: true });
+
+                if (stasisEvaluationLoop) clearInterval(stasisEvaluationLoop);
+                stasisEvaluationLoop = setInterval(evaluateStasisMetrics, 1000);
+
+            } else {
+                document.getElementById('telemetry-coordinates-box').innerText = "13.0827° N, 80.2707° E";
+                appendLogMessage("GPS Error: Browser framework geolocation nodes dropped.");
+            }
+        }
+
+        function evaluateStasisMetrics() {
+            if (isEmergencyTriggered || lastKnownLat === null) return;
+            stationarySecondsCount++;
+            
+            if (stationarySecondsCount === 10 || stationarySecondsCount === 20) {
+                appendLogMessage(`AI Track: Location stasis check parameters unchanged for ${stationarySecondsCount}s...`);
+            }
+
+            if (stationarySecondsCount > 30) {
+                clearInterval(stasisEvaluationLoop);
+                initiateStasisEscalation();
+            }
+        }
+
+        function simulateStasisEvent() {
+            if (isEmergencyTriggered) return;
+            appendLogMessage("Simulation Deck: Overriding standard interval counts to fire stasis sequence.");
+            stationarySecondsCount = 31;
+            clearInterval(stasisEvaluationLoop);
+            initiateStasisEscalation();
+        }
+
+        function initiateStasisEscalation() {
+            appendLogMessage("🚨 CRITICAL: Location stasis tracking crossed 30s limit!");
+            
+            const siren = document.getElementById('emergency-siren');
+            siren.play().catch(e => console.log("Audio asset intercept blocked."));
+
+            document.getElementById('threat-modal-title').innerText = "⚠️ Anomalous Stasis Trace";
+            document.getElementById('threat-modal-desc').innerText = "Zero movement vector logged for more than 30s. Emergency alert sound loop initialized. Tap Stop below to halt security transmission sequence.";
+            document.getElementById('stasis-warning-modal').style.display = 'flex';
+            
+            let gracePeriodSeconds = 10;
+            document.getElementById('countdown-ticker').innerText = gracePeriodSeconds;
+            
+            if (counterClock) clearInterval(counterClock);
+            counterClock = setInterval(() => {
+                gracePeriodSeconds--;
+                document.getElementById('countdown-ticker').innerText = gracePeriodSeconds;
+                appendLogMessage(`AI Guard: Stasis grace counter ticking down (${gracePeriodSeconds}s remaining)...`);
+
+                if (gracePeriodSeconds <= 0) {
+                    clearInterval(counterClock);
+                    document.getElementById('stasis-warning-modal').style.display = 'none';
+                    fireEmergencyProtocol("Automated Static Position Target Failure Timeout");
+                }
+            }, 1000);
+        }
+
+        function fireEmergencyProtocol(cause) {
+            isEmergencyTriggered = true;
+            clearInterval(counterClock);
+            clearInterval(stasisEvaluationLoop);
+            document.getElementById('stasis-warning-modal').style.display = 'none';
+            
+            if (speechRecognitionEngine) {
+                try { speechRecognitionEngine.stop(); } catch(e) {}
+            }
+            
+            document.getElementById('emergency-siren').pause();
+            
+            document.getElementById('status-signal-dot').className = "status-dot-pulse alerted";
+            document.getElementById('status-signal-text').innerText = "CRITICAL PACKETS TRANSMITTED";
+            document.getElementById('alert-reason-box').innerText = `Verified Source: ${cause}`;
+            
+            const currentCoordinates = document.getElementById('telemetry-coordinates-box').innerText;
+            const liveMapUrl = `https://maps.google.com/?q=${currentCoordinates.replace(/[°NE\s]/g, '').replace(',', ',')}`;
+
+            const headline = document.getElementById('dynamic-alert-headline');
+            const alertBorder = document.getElementById('alert-border-style');
+            const smsBox = document.getElementById('dynamic-sms-payload-text');
+            const callBox = document.getElementById('dynamic-call-payload-text');
+
+            if (cause.includes("Vocal") || cause.includes("Distress") || cause.includes("HELP")) {
+                alertBorder.style.borderTopColor = "#ff66b2"; 
+                headline.innerHTML = "🗣️ AI Vocal Distress Threat Flagged";
+                smsBox.innerHTML = `"SheGuard AI Alert: Vocal distress keywords ('HELP'/'STOP') captured natively via user environment mic block! Live Tracking Coordinate Payloads: ${liveMapUrl}"`;
+                callBox.innerHTML = "AI Automated Priority Link: Connecting outbound audio bridge channel to Safe Circle Loop Contacts...";
+                
+            } else if (cause.includes("Timeout") || cause.includes("Static") || cause.includes("Immobility")) {
+                alertBorder.style.borderTopColor = "#FFC107"; 
+                headline.innerHTML = "📍 Automated Position Stasis Alert";
+                smsBox.innerHTML = `"SheGuard Tracker Alert: Anomalous stationary posture detected! System tracking logged zero structural location change for over 30s. Verified Coordinates Pin: ${liveMapUrl}"`;
+                callBox.innerHTML = "Automated Dispatch Sequence: Placing background carrier warning lines loop sequence...";
+                
+            } else {
+                alertBorder.style.borderTopColor = "#7a358c"; 
+                headline.innerHTML = "🚨 Emergency Interface SOS Assertion";
+                smsBox.innerHTML = `"SheGuard Manual SOS Alert: User explicitly asserted safety barrier layout boundaries! Immediate tracking payload deployed: ${liveMapUrl}"`;
+                callBox.innerHTML = "Trunk Link Priority Assert: Initializing multi-channel direct calls lines matrix loop...";
+            }
+            
+            document.getElementById('emergency-alert-modal').style.display = 'flex';
+            appendLogMessage(`[BROADCAST DISPATCH]: ${headline.innerText} payloads sent into system pipelines successfully.`);
+        }
+
+        function dismissEmergencySystem() {
+            isEmergencyTriggered = false;
+            clearInterval(counterClock);
+            document.getElementById('stasis-warning-modal').style.display = 'none';
+            document.getElementById('emergency-alert-modal').style.display = 'none';
+            
+            const siren = document.getElementById('emergency-siren');
+            siren.pause();
+            siren.currentTime = 0;
+            
+            document.getElementById('status-signal-dot').className = "status-dot-pulse";
+            document.getElementById('status-signal-text').innerText = "AI Guard: Active & Monitoring";
+            document.getElementById('audio-state-text').innerText = "Listening for vocal anchors";
+            document.getElementById('audio-state-text').style.color = "#4CAF50";
+            
+            stationarySecondsCount = 0;
+            appendLogMessage("[PIPELINE RESET]: Reset algorithms context layout back to baseline.");
+            
+            if (stasisEvaluationLoop) clearInterval(stasisEvaluationLoop);
+            stasisEvaluationLoop = setInterval(evaluateStasisMetrics, 1000);
+            
+            startContinuousSpeechRecognition();
+        }
+
+        function triggerShakeSimulation() {
+            appendLogMessage("Sensor Logic: Analyzing accelerometer delta matrices...");
+            setTimeout(() => appendLogMessage("Sensor Logic: Rapid vector threshold spike count (2/3)..."), 300);
+            setTimeout(() => {
+                appendLogMessage("Sensor Logic: Accelerometer gesture matching metrics achieved.");
+                fireEmergencyProtocol("3x Kinetic Acceleration Device Shake");
+            }, 600);
+        }
+
+        function triggerVoiceSimulation() {
+            document.getElementById('audio-state-text').innerText = "Matched Command: 'HELP!'";
+            document.getElementById('audio-state-text').style.color = "#ff66b2";
+            appendLogMessage("Simulation Deck: Injecting mock voice event string frame validation logic.");
+            fireEmergencyProtocol("Vocal Trigger Pattern Event Match");
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeHer - Landing Page</title>
+    <style>
+        :root {
+            --primary: #6A1B9A;
+            --accent: #E91E63;
+            --bg-dark: #121214;
+            --card-bg: #1A1A1E;
+            --text-light: #F5F5F7;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; scroll-behavior: smooth; }
+        body { background-color: #ffffff; color: #333; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 5%; background-color: #fff; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #f0f0f0; }
+        .logo-container { display: flex; align-items: center; gap: 10px; }
+        .logo-placeholder { width: 40px; height: 40px; background-color: #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 10px; border-radius: 8px; }
+        .logo-text h1 { font-size: 24px; color: #5c258d; font-weight: 700; line-height: 1; }
+        .logo-text span { font-size: 9px; color: #888; letter-spacing: 1px; display: block; }
+        nav ul { display: flex; list-style: none; gap: 30px; }
+        nav ul li a { text-decoration: none; color: #666; font-size: 14px; font-weight: 500; transition: color 0.3s; padding-bottom: 4px; }
+        nav ul li a.active, nav ul li a:hover { color: #5c258d; border-bottom: 2px solid #5c258d; }
+        .contact-btn { background-color: #5c258d; color: #fff; padding: 10px 24px; border-radius: 20px; text-decoration: none; font-size: 14px; font-weight: 500; transition: background 0.3s; }
+        .contact-btn:hover { background-color: #431966; }
+        .hero { position: relative; background-color: #0b031a; min-height: calc(100vh - 80px); display: flex; flex-direction: column; justify-content: space-between; padding: 60px 5% 30px 5%; color: #fff; overflow: hidden; }
+        .hero-bg-placeholder { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background-image: linear-gradient(to right, rgba(11, 3, 26, 0.9), rgba(11, 3, 26, 0.55)), url('hero-bg.png'); background-size: cover; background-position: center; pointer-events: none; }
+        .hero-content { position: relative; z-index: 2; max-width: 600px; margin-top: 40px; }
+        .hero h2 { font-size: 48px; font-weight: 700; line-height: 1.2; margin-bottom: 20px; }
+        .hero h2 span { color: #ff66b2; }
+        .hero p { font-size: 15px; color: #ccc; line-height: 1.6; margin-bottom: 35px; }
+        .hero-buttons { display: flex; gap: 15px; }
+        .btn-gradient { background: linear-gradient(to right, #7b2cbf, #ff66b2); color: white; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: 500; box-shadow: 0 0 15px rgba(255, 102, 178, 0.4); transition: transform 0.2s; }
+        .btn-gradient:hover { transform: scale(1.03); }
+        .btn-outline { border: 1px solid #fff; color: white; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: 500; transition: background 0.3s; }
+        .btn-outline:hover { background: rgba(255,255,255,0.1); }
+        .hero-features { position: relative; z-index: 2; background: rgba(255, 255, 255, 0.06); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; display: grid; grid-template-columns: repeat(4, 1fr); padding: 25px; margin-top: 50px; }
+        .feature-item { display: flex; align-items: center; gap: 15px; padding: 0 15px; border-right: 1px solid rgba(255, 255, 255, 0.1); }
+        .feature-item:last-child { border-right: none; }
+        .feature-icon-placeholder { width: 45px; height: 45px; background-color: #5c258d; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff; font-size: 12px; }
+        .feature-text h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .feature-text p { font-size: 11px; color: #bbb; margin-bottom: 0; line-height: 1.3; }
+        .how-it-works-section { background-color: var(--bg-dark); color: var(--text-light); padding: 80px 5% 40px 5%; text-align: center; }
+        .section-title { font-size: 36px; margin-bottom: 50px; color: var(--text-light); }
+        .steps-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; margin-bottom: 60px; }
+        .step-card { background: var(--card-bg); padding: 30px 20px; border-radius: 15px; border: 1px solid #2A2A30; text-align: center; }
+        .step-icon { width: 60px; height: 60px; background: rgba(106, 27, 154, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--accent); font-size: 24px; font-weight: bold; }
+        .step-card h3 { margin-bottom: 12px; font-size: 20px; color: var(--text-light); }
+        .step-card p { color: #999; font-size: 14px; line-height: 1.5; }
+        .banner-box { background: rgba(106, 27, 154, 0.15); border-radius: 20px; padding: 40px; display: flex; align-items: center; justify-content: space-between; text-align: left; max-width: 1000px; margin: 0 auto 40px auto; border: 1px solid rgba(106, 27, 154, 0.3); }
+        .banner-img { width: 45%; height: 200px; object-fit: cover; border-radius: 10px; }
+        .stats-container { padding: 40px 0 20px 0; background-color: transparent; width: 100%; }
+        .stats-bar { background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; display: grid; grid-template-columns: repeat(4, 1fr); padding: 30px 20px; text-align: center; }
+        .stat-item { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 15px; border-right: 1px solid rgba(255, 255, 255, 0.15); }
+        .stat-item:last-child { border-right: none; }
+        .stat-icon-placeholder { width: 40px; height: 40px; background-color: transparent; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .stat-info { text-align: left; }
+        .stat-info h3 { font-size: 24px; color: var(--text-light); font-weight: 700; }
+        .stat-info p { font-size: 13px; color: #aaa; }
+        @media (max-width: 992px) { .hero-features, .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 20px; } .feature-item, .stat-item { border-right: none; } .banner-box { flex-direction: column; gap: 20px; text-align: center; } .banner-box div { max-width: 100% !important; } .banner-img { width: 100%; } }
+        @media (max-width: 600px) { .hero-features, .stats-bar { grid-template-columns: 1fr; } nav { display: none; } .hero h2 { font-size: 32px; } }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <div class="logo-placeholder">Logo</div>
+            <div class="logo-text">
+                <h1>SafeHer</h1>
+                <span>BE SAFE, BE STRONG</span>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="#how-it-works-target">How It Works</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+        <a href="about.html" class="contact-btn">Contact Us</a>
+    </header>
+    <section class="hero">
+        <div class="hero-bg-placeholder"></div>
+        <div class="hero-content">
+            <h2>AI-Powered<br>Women's <span>Safety</span><br>For A Better Tomorrow</h2>
+            <p>SafeHer is an intelligent safety platform that ensures women's security with real-time alerts, live tracking and AI-powered assistance.</p>
+            <div class="hero-buttons">
+                <a href="login.html" class="btn-gradient">Get Started</a>
+                <a href="#how-it-works-target" class="btn-outline">Learn More</a>
+            </div>
+        </div>
+        <div class="hero-features">
+            <div class="feature-item"><div class="feature-icon-placeholder">SOS</div><div class="feature-text"><h4>SOS Alerts</h4><p>Instant alert to emergency contacts</p></div></div>
+            <div class="feature-item"><div class="feature-icon-placeholder">GPS</div><div class="feature-text"><h4>Live Tracking</h4><p>Real-time location tracking</p></div></div>
+            <div class="feature-item"><div class="feature-icon-placeholder">AI</div><div class="feature-text"><h4>AI Assistance</h4><p>Smart AI support in emergency</p></div></div>
+            <div class="feature-item"><div class="feature-icon-placeholder">SEC</div><div class="feature-text"><h4>Secure & Private</h4><p>Your data is safe and encrypted</p></div></div>
+        </div>
+    </section>
+    <section class="how-it-works-section" id="how-it-works-target">
+        <h2 class="section-title">How SafeHer Works</h2>
+        <div class="steps-container">
+            <div class="step-card"><div class="step-icon">1</div><h3>Sign Up</h3><p>Create your account secure space profile inside the client dashboard environment.</p></div>
+            <div class="step-card"><div class="step-icon">2</div><h3>Setup Profile</h3><p>Add your emergency contacts and trusted loop phone numbers during configuration.</p></div>
+            <div class="step-card"><div class="step-icon">3</div><h3>Stay Safe</h3><p>We monitor & protect you 24/7 utilizing automated, non-stop ambient system processing.</p></div>
+            <div class="step-card"><div class="step-icon">4</div><h3>Get Help</h3><p>Send automated SOS markers or let AI-driven tracking handle notifications without manual inputs.</p></div>
+        </div>
+        <div class="banner-box">
+            <div style="max-width: 50%;"><h3 style="font-size: 24px; margin-bottom: 15px;">Together, let's build a safer world for every woman.</h3><p style="color: #BBB; font-size: 15px;">Our software coordinates seamlessly with modern laptop browser layers to keep you monitored everywhere.</p></div>
+            <img src="how-it-works-banner.png" alt="SafeHer Group Illustration" class="banner-img" onerror="this.style.display='none'">
+        </div>
+        <div class="stats-container">
+            <div class="stats-bar">
+                <div class="stat-item"><div class="stat-icon-placeholder">👤</div><div class="stat-info"><h3>5000+</h3><p>Users</p></div></div>
+                <div class="stat-item"><div class="stat-icon-placeholder">🔔</div><div class="stat-info"><h3>1200+</h3><p>SOS Alerts</p></div></div>
+                <div class="stat-item"><div class="stat-icon-placeholder">👥</div><div class="stat-info"><h3>50+</h3><p>Partner Orgs</p></div></div>
+                <div class="stat-item"><div class="stat-icon-placeholder">📞</div><div class="stat-info"><h3>24/7</h3><p>Support</p></div></div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
