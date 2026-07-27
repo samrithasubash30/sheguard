@@ -38,15 +38,18 @@ async function initializeDatabase() {
         await client.query(`
             CREATE TABLE IF NOT EXISTS profiles (
                 user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+                name TEXT,
                 dob TEXT,
-                gender TEXT,
-                blood_type TEXT,
                 address TEXT,
                 city TEXT,
                 state TEXT,
                 updated_at TIMESTAMP DEFAULT NOW()
             )
         `);
+        // Migrate any pre-existing profiles table (created before this change)
+        await client.query(`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS name TEXT`);
+        await client.query(`ALTER TABLE profiles DROP COLUMN IF EXISTS gender`);
+        await client.query(`ALTER TABLE profiles DROP COLUMN IF EXISTS blood_type`);
         await client.query(`
             CREATE TABLE IF NOT EXISTS contacts (
                 id SERIAL PRIMARY KEY,

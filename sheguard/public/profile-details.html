@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeHer Setup - Personal Profile Context</title>
+    <title>SafeHer Setup - Personal Profile</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background-color: #121214; color: #F5F5F7; min-height: 100vh; padding: 40px 20px; }
@@ -20,9 +20,18 @@
         
         .form-field input, .form-field select { padding: 12px; background: #222226; border: 1px solid #333; border-radius: 8px; color: white; font-size: 14px; outline: none; }
         .form-field input:focus, .form-field select:focus { border-color: #5c258d; }
+
+        /* Photo preview */
+        .photo-preview-wrapper { display: flex; align-items: center; gap: 20px; }
+        .photo-preview-wrapper img { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid #5c258d; display: none; }
+        .photo-preview-wrapper input { flex: 1; }
         
         .btn-wrapper { display: flex; justify-content: flex-end; margin-top: 20px; border-top: 1px solid #2A2A30; padding-top: 25px; }
         .btn-next { background: linear-gradient(45deg, #5c258d, #ff66b2); color: white; border: none; padding: 12px 35px; border-radius: 25px; font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: none; }
+
+        .save-status { font-size: 13px; padding: 10px 16px; border-radius: 8px; margin-bottom: 20px; display: none; }
+        .save-status.error { background: rgba(233,30,99,0.15); border: 1px solid #E91E63; color: #ff66b2; }
+        .save-status.success { background: rgba(76,175,80,0.15); border: 1px solid #4CAF50; color: #4CAF50; }
 
         @media (max-width: 600px) {
             body { padding: 20px 12px; }
@@ -33,108 +42,104 @@
             .step-header h2 { font-size: 20px; }
             .btn-next { padding: 14px 28px; font-size: 14px; }
         }
-
-        .save-status {
-            font-size: 13px;
-            padding: 10px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        .save-status.error { background: rgba(233,30,99,0.15); border: 1px solid #E91E63; color: #ff66b2; }
-        .save-status.success { background: rgba(76,175,80,0.15); border: 1px solid #4CAF50; color: #4CAF50; }
     </style>
 </head>
 <body>
 
     <div class="form-container">
         <div class="step-header">
-            <h2>Step 1: Personalization Metrics</h2>
-            <p>Configure device internal profile values (All values configuration layer mapping)</p>
+            <h2>Step 1: Personal Profile</h2>
+            <p>Set up your personal details for your SafeHer account</p>
         </div>
 
         <div class="save-status" id="save-status"></div>
         
         <form id="metrics-form">
+
+            <!-- Profile Photo -->
             <div class="form-field full-width">
-                <label>Profile Identifier Asset <span>(Optional)</span></label>
-                <input type="file" accept="image/*">
-            </div>
-
-            <div class="grid-row">
-                <div class="form-field">
-                    <label>Date of Birth <span>(Optional)</span></label>
-                    <input type="date" id="dob">
-                </div>
-                <div class="form-field">
-                    <label>Gender <span>(Optional)</span></label>
-                    <select id="gender">
-                        <option value="Female" selected>Female (Default Option)</option>
-                        <option value="Male">Male</option>
-                        <option value="Other">Custom Orientation Vector</option>
-                    </select>
+                <label>Profile Photo <span>(Optional)</span></label>
+                <div class="photo-preview-wrapper">
+                    <img id="photo-preview" src="" alt="Preview">
+                    <input type="file" accept="image/*" id="profile-photo" onchange="previewPhoto(this)">
                 </div>
             </div>
 
+            <!-- Full Name -->
+            <div class="form-field full-width">
+                <label>Full Name <span>(Required)</span></label>
+                <input type="text" id="full-name" placeholder="Enter your full name..." required>
+            </div>
+
+            <!-- Date of Birth -->
             <div class="form-field">
-                <label>Blood Classification Metric <span>(Optional - Highly Recommended for Medical Dispatch)</span></label>
-                <select id="blood-type">
-                    <option value="">Select blood type structural configuration...</option>
-                    <option value="O+">O Positive (O+)</option>
-                    <option value="A+">A Positive (A+)</option>
-                    <option value="B+">B Positive (B+)</option>
-                    <option value="AB+">AB Positive (AB+)</option>
-                    <option value="O-">O Negative (O-)</option>
-                    <option value="A-">A Negative (A-)</option>
-                    <option value="B-">B Negative (B-)</option>
-                    <option value="AB-">AB Negative (AB-)</option>
-                </select>
+                <label>Date of Birth <span>(Optional)</span></label>
+                <input type="date" id="dob">
             </div>
 
+            <!-- Address -->
             <div class="form-field full-width">
-                <label>Residential Fixed Baseline Address <span>(Optional)</span></label>
-                <input type="text" id="address" placeholder="House/Flat No, Street Node Details...">
+                <label>Home Address <span>(Optional)</span></label>
+                <input type="text" id="address" placeholder="House/Flat No, Street, Area...">
             </div>
 
+            <!-- City and State -->
             <div class="grid-row">
                 <div class="form-field">
-                    <label>City Matrix Name <span>(Optional)</span></label>
+                    <label>City <span>(Optional)</span></label>
                     <input type="text" id="city" placeholder="e.g. Chennai">
                 </div>
                 <div class="form-field">
-                    <label>State / Region <span>(Optional)</span></label>
+                    <label>State <span>(Optional)</span></label>
                     <input type="text" id="state" placeholder="e.g. Tamil Nadu">
                 </div>
             </div>
 
             <div class="btn-wrapper">
-                <button type="submit" class="btn-next">Save & Advance Vector Elements ➔</button>
+                <button type="submit" class="btn-next">Save & Continue ➔</button>
             </div>
         </form>
     </div>
 
     <script>
-        // Guard: redirect to login if no session
         const userId = localStorage.getItem('sheguard_userId');
         if (!userId) { window.location.href = 'login.html'; }
 
-        // Pre-fill form with existing profile data from database
+        // Profile photo preview + save to localStorage
+        function previewPhoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('photo-preview');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    localStorage.setItem('sheguard_photo', e.target.result);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Load existing profile data
         async function loadExistingProfile() {
             try {
                 const response = await fetch(`/api/profile/${userId}`);
                 const result = await response.json();
                 if (result.success && result.profile) {
                     const p = result.profile;
+                    if (p.name) document.getElementById('full-name').value = p.name;
                     if (p.dob) document.getElementById('dob').value = p.dob;
-                    if (p.gender) document.getElementById('gender').value = p.gender;
-                    if (p.blood_type) document.getElementById('blood-type').value = p.blood_type;
                     if (p.address) document.getElementById('address').value = p.address;
                     if (p.city) document.getElementById('city').value = p.city;
                     if (p.state) document.getElementById('state').value = p.state;
                 }
-            } catch (err) {
-                // Silent fail — form stays blank
-            }
+                // Load saved photo
+                const savedPhoto = localStorage.getItem('sheguard_photo');
+                if (savedPhoto) {
+                    const preview = document.getElementById('photo-preview');
+                    preview.src = savedPhoto;
+                    preview.style.display = 'block';
+                }
+            } catch (err) {}
         }
 
         loadExistingProfile();
@@ -148,12 +153,16 @@
 
         document.getElementById('metrics-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            const name = document.getElementById('full-name').value.trim();
+            if (!name) {
+                return showStatus('error', 'Please enter your full name.');
+            }
             
             const payloadFields = {
                 userId: userId,
+                name: name,
                 dob: document.getElementById('dob').value,
-                gender: document.getElementById('gender').value,
-                bloodType: document.getElementById('blood-type').value,
                 address: document.getElementById('address').value,
                 city: document.getElementById('city').value,
                 state: document.getElementById('state').value
@@ -175,7 +184,7 @@
                     showStatus('error', result.message || 'Error saving profile.');
                 }
             } catch (err) {
-                showStatus('error', 'Connection error. Make sure the server is running.');
+                showStatus('error', 'Connection error. Please try again.');
             }
         });
     </script>
