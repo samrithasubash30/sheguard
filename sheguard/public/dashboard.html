@@ -834,7 +834,7 @@
                     greetingEl.style.display = 'flex';
                 }
 
-                const savedPhoto = localStorage.getItem('sheguard_photo');
+                const savedPhoto = localStorage.getItem('sheguard_photo_' + userId);
                 if (savedPhoto) {
                     photoEl.innerHTML = `<img src="${savedPhoto}" alt="Profile">`;
                     greetingEl.style.display = 'flex';

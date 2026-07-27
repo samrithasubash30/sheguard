@@ -528,7 +528,7 @@
                 preview.src = e.target.result;
                 preview.style.display = 'block';
                 defaultIcon.style.display = 'none';
-                localStorage.setItem('sheguard_photo', e.target.result);
+                localStorage.setItem('sheguard_photo_' + userId, e.target.result);
             };
             reader.readAsDataURL(input.files[0]);
         }
@@ -548,7 +548,7 @@
                 if (p.state) document.getElementById('state').value = p.state;
             }
             // Load saved photo
-            const savedPhoto = localStorage.getItem('sheguard_photo');
+            const savedPhoto = localStorage.getItem('sheguard_photo_' + userId);
             if (savedPhoto) {
                 const preview = document.getElementById('photo-preview');
                 const defaultIcon = document.getElementById('avatar-default-icon');
