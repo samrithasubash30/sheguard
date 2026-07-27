@@ -108,17 +108,17 @@ app.post('/api/auth/login', async (req, res) => {
 
 // 3. SAVE PROFILE
 app.post('/api/profile/save', async (req, res) => {
-    const { userId, dob, gender, bloodType, address, city, state } = req.body;
+    const { userId, name, dob, address, city, state } = req.body;
     if (!userId) return res.status(400).json({ success: false, message: 'User ID is required.' });
     try {
         await pool.query(`
-            INSERT INTO profiles (user_id, dob, gender, blood_type, address, city, state, updated_at)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
-            ON CONFLICT (user_id) DO UPDATE SET
-                dob = EXCLUDED.dob, gender = EXCLUDED.gender,
-                blood_type = EXCLUDED.blood_type, address = EXCLUDED.address,
-                city = EXCLUDED.city, state = EXCLUDED.state, updated_at = NOW()
-        `, [userId, dob, gender, bloodType, address, city, state]);
+            INSERT INTO profiles (user_id, name, dob, address, city, state, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, NOW())
+ON CONFLICT (user_id) DO UPDATE SET
+    name = EXCLUDED.name, dob = EXCLUDED.dob,
+    address = EXCLUDED.address, city = EXCLUDED.city,
+    state = EXCLUDED.state, updated_at = NOW()
+`, [userId, name, dob, address, city, state]);
         res.json({ success: true, message: 'Personal metrics synchronized successfully.' });
     } catch (err) {
         console.error('Profile save error:', err);
