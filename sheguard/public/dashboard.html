@@ -997,6 +997,48 @@
             document.getElementById('notified-side-panel').style.display = 'none';
         }
 
+        // NEW: simulates calling Safe Circle contacts one at a time, in priority order —
+        // if there's no answer within a few seconds, it moves on to the next contact.
+        let callEscalationTimer = null;
+        let callEscalationIndex = 0;
+
+        function startCallEscalation() {
+            const callBox = document.getElementById('dynamic-call-payload-text');
+            callEscalationIndex = 0;
+
+            if (!safeCircleContacts || safeCircleContacts.length === 0) {
+                callBox.innerHTML = "No saved contacts to call. Please add a Safe Circle contact.";
+                return;
+            }
+
+            function attemptCall() {
+                const contact = safeCircleContacts[callEscalationIndex];
+                const label = contact.relationship ? `${contact.name} (${contact.relationship})` : contact.name;
+                callBox.innerHTML = `Calling <strong>${label}</strong>...`;
+                appendLogMessage(`[CALL]: Dialing ${label} — Priority ${callEscalationIndex + 1}.`);
+            }
+
+            attemptCall();
+
+            if (callEscalationTimer) clearInterval(callEscalationTimer);
+            if (safeCircleContacts.length > 1) {
+                callEscalationTimer = setInterval(() => {
+                    const missedContact = safeCircleContacts[callEscalationIndex];
+                    const missedLabel = missedContact.relationship ? `${missedContact.name} (${missedContact.relationship})` : missedContact.name;
+                    appendLogMessage(`[CALL]: No answer from ${missedLabel}. Escalating to next priority.`);
+
+                    callEscalationIndex = (callEscalationIndex + 1) % safeCircleContacts.length;
+                    attemptCall();
+                }, 6000);
+            }
+        }
+
+        // NEW: stops the call escalation loop (on Stop / I'm Safe Now)
+        function stopCallEscalation() {
+            if (callEscalationTimer) clearInterval(callEscalationTimer);
+            callEscalationTimer = null;
+        }
+
         // ── LOAD REAL CONTACTS FROM DATABASE ──────────────────────────────────
         async function loadSafetyCircleFromDatabase() {
             try {
@@ -1241,32 +1283,29 @@
             const alertBorder = document.getElementById('alert-border-style');
             const reasonBox = document.getElementById('alert-reason-box');
             const smsBox = document.getElementById('dynamic-sms-payload-text');
-            const callBox = document.getElementById('dynamic-call-payload-text');
 
             if (cause.includes("Vocal") || cause.includes("Distress") || cause.includes("HELP")) {
                 alertBorder.style.borderTopColor = "#ff66b2"; 
                 headline.innerHTML = "🗣️ Voice Alert Sent";
                 reasonBox.innerText = "We heard a distress word and sent this alert automatically.";
                 smsBox.innerHTML = `We heard you say "help" or "stop" and shared your live location: <a href="${liveMapUrl}" target="_blank">${liveMapUrl}</a>`;
-                callBox.innerHTML = "Trying to reach your Safe Circle by phone...";
                 
             } else if (cause.includes("Timeout") || cause.includes("Static") || cause.includes("Immobility")) {
                 alertBorder.style.borderTopColor = "#FFC107"; 
                 headline.innerHTML = "📍 Location Alert Sent";
                 reasonBox.innerText = "We noticed you haven't moved in over 30 seconds.";
                 smsBox.innerHTML = `No movement detected for 30+ seconds. Your live location: <a href="${liveMapUrl}" target="_blank">${liveMapUrl}</a>`;
-                callBox.innerHTML = "Trying to reach your Safe Circle by phone...";
                 
             } else {
                 alertBorder.style.borderTopColor = "#7a358c"; 
                 headline.innerHTML = "🚨 SOS Alert Sent";
                 reasonBox.innerText = "You pressed the SOS button.";
                 smsBox.innerHTML = `Your live location has been shared: <a href="${liveMapUrl}" target="_blank">${liveMapUrl}</a>`;
-                callBox.innerHTML = "Trying to reach your Safe Circle by phone...";
             }
             
             document.getElementById('emergency-alert-modal').style.display = 'flex';
             showNotifiedPanel(); // NEW: show who was notified, separately, beside the modal
+            startCallEscalation(); // NEW: simulate calling contacts one at a time, in priority order
             appendLogMessage(`[BROADCAST DISPATCH]: ${headline.innerText} sent successfully.`);
         }
 
@@ -1277,6 +1316,7 @@
             document.getElementById('emergency-alert-modal').style.display = 'none';
             hideSafeCircleNotice(); // NEW: make sure the notice is cleared on Stop too
             hideNotifiedPanel(); // NEW: hide the notified side panel too
+            stopCallEscalation(); // NEW: stop the simulated call cycle
             
             const siren = document.getElementById('emergency-siren');
             siren.pause();
