@@ -230,6 +230,7 @@ app.post('/api/emergency/notify', async (req, res) => {
         const reasonLine = cause ? `\n\nReason: ${cause}` : '';
 
         let sentCount = 0;
+        let lastError = null;
         for (const contact of contactsResult.rows) {
             const bodyText = `Hi ${contact.name},\n\n${userName} has triggered a SafeHer emergency alert and may need help.${reasonLine}${locationLine}\n\nPlease reach out to them or contact local authorities if you're unable to reach them.\n\n— Sent automatically by SafeHer`;
             try {
@@ -242,10 +243,17 @@ app.post('/api/emergency/notify', async (req, res) => {
                 sentCount++;
             } catch (mailErr) {
                 console.error(`Failed to email ${contact.email}:`, mailErr.message);
+                lastError = mailErr.message;
             }
         }
 
-        res.json({ success: true, sent: sentCount, total: contactsResult.rows.length, message: `Sent ${sentCount} of ${contactsResult.rows.length} emails.` });
+        res.json({
+            success: true,
+            sent: sentCount,
+            total: contactsResult.rows.length,
+            error: sentCount === 0 ? lastError : null,
+            message: `Sent ${sentCount} of ${contactsResult.rows.length} emails.`
+        });
     } catch (err) {
         console.error('Emergency notify error:', err);
         res.status(500).json({ success: false, message: 'Failed to send emergency emails.' });

@@ -1320,10 +1320,12 @@
                 });
                 const result = await response.json();
                 if (result.success) {
-                    if (result.sent > 0) {
+                    if (result.total === 0) {
+                        appendLogMessage(`[EMAIL]: No contacts have an email saved yet — no emails sent.`);
+                    } else if (result.sent > 0) {
                         appendLogMessage(`[EMAIL]: Sent ${result.sent} of ${result.total} alert email(s).`);
                     } else {
-                        appendLogMessage(`[EMAIL]: No contacts have an email saved yet — no emails sent.`);
+                        appendLogMessage(`[EMAIL ERROR]: Failed to send. ${result.error || 'Unknown error.'}`);
                     }
                 } else {
                     appendLogMessage(`[EMAIL ERROR]: ${result.message || 'Failed to send alert emails.'}`);
