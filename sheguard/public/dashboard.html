@@ -497,6 +497,33 @@
             background: #5c258d;
         }
 
+        /* --- SAFE CIRCLE NOTICE TOAST (shown alongside the grace-period modal) --- */
+        .safe-circle-toast {
+            display: none;
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2100;
+            background: #232931;
+            color: #ffffff;
+            padding: 14px 22px;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            border-left: 5px solid #ff66b2;
+            max-width: 420px;
+            width: calc(100% - 40px);
+            text-align: left;
+            font-size: 12.5px;
+            line-height: 1.5;
+        }
+        .safe-circle-toast strong {
+            color: #ff66b2;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 13.5px;
+        }
+
         /* ═══════════════════════════════════════
            MOBILE RESPONSIVE — Full Fix
         ═══════════════════════════════════════ */
@@ -648,6 +675,12 @@
                 font-size: 11px;
                 word-break: break-all;
             }
+
+            .safe-circle-toast {
+                top: 12px;
+                padding: 12px 16px;
+                font-size: 11.5px;
+            }
         }
 
         /* Very small phones */
@@ -787,6 +820,12 @@
         </div>
     </main>
 
+    <!-- NEW: Safe Circle notice toast — shown alongside the grace-period modal -->
+    <div id="safe-circle-notice-toast" class="safe-circle-toast">
+        <strong>🔔 Notifying Your Safe Circle</strong>
+        <span id="safe-circle-notice-text">Your trusted contacts will be alerted automatically when the timer reaches 0. Tap Stop to cancel.</span>
+    </div>
+
     <div id="stasis-warning-modal" class="modal">
         <div class="modal-content" style="border-top-color: #FFC107;">
             <h2 id="threat-modal-title" style="color:#6a1b9a; font-size:22px;">⚠️ Dynamic Threat Flagged</h2>
@@ -851,6 +890,7 @@
         let stationarySecondsCount = 0;
         let isEmergencyTriggered = false;
         let speechRecognitionEngine = null;
+        let safeCircleContacts = []; // NEW: holds loaded contacts so we can reference them in popups
 
         function appendLogMessage(msg) {
             const displayBox = document.getElementById('terminal-stream-box');
@@ -865,6 +905,29 @@
             window.location.href = 'index.html';
         }
 
+        // NEW: builds a readable "Name (Relationship)" list from loaded contacts
+        function getSafeCircleNamesText() {
+            if (!safeCircleContacts || safeCircleContacts.length === 0) {
+                return 'your trusted contacts';
+            }
+            return safeCircleContacts
+                .map(c => c.relationship ? `${c.name} (${c.relationship})` : c.name)
+                .join(', ');
+        }
+
+        // NEW: shows the floating "Notifying Safe Circle" toast during the grace period
+        function showSafeCircleNotice() {
+            const toast = document.getElementById('safe-circle-notice-toast');
+            const textEl = document.getElementById('safe-circle-notice-text');
+            textEl.innerText = `${getSafeCircleNamesText()} will be alerted automatically when the timer reaches 0. Tap Stop to cancel.`;
+            toast.style.display = 'block';
+        }
+
+        // NEW: hides the floating toast
+        function hideSafeCircleNotice() {
+            document.getElementById('safe-circle-notice-toast').style.display = 'none';
+        }
+
         // ── LOAD REAL CONTACTS FROM DATABASE ──────────────────────────────────
         async function loadSafetyCircleFromDatabase() {
             try {
@@ -873,6 +936,7 @@
                 const listEl = document.getElementById('safe-circle-list');
 
                 if (result.success && result.contacts.length > 0) {
+                    safeCircleContacts = result.contacts; // NEW: store for later use in popups
                     listEl.innerHTML = '';
                     result.contacts.forEach(c => {
                         const emoji = ['🧑','👩','🧔','👨','🛡️'][Math.floor(Math.random() * 5)];
@@ -894,6 +958,7 @@
                     });
                     appendLogMessage(`[SERVER SYNC]: Loaded ${result.contacts.length} verified contacts from database.`);
                 } else {
+                    safeCircleContacts = []; // NEW
                     listEl.innerHTML = '<div style="color:#aaa; font-size:12px; text-align:center; margin-top:30px; padding:0 10px;">No contacts saved yet.<br><a href="contact-details.html" style="color:#ff66b2;">Add contacts →</a></div>';
                     appendLogMessage('[SERVER SYNC]: No contacts found in database for this user.');
                 }
@@ -976,6 +1041,7 @@
             document.getElementById('threat-modal-title').innerText = `🗣️ Vocal Threat Flagged: "${matchedPhrase}"`;
             document.getElementById('threat-modal-desc').innerText = `Captured anchor word via system mic matrix. Siren audio executed. Tap Stop to prevent cascading emergency dispatch calling lines.`;
             document.getElementById('stasis-warning-modal').style.display = 'flex';
+            showSafeCircleNotice(); // NEW: show the notice alongside the grace-period modal
 
             let gracePeriodSeconds = 10;
             document.getElementById('countdown-ticker').innerText = gracePeriodSeconds;
@@ -989,6 +1055,7 @@
                 if (gracePeriodSeconds <= 0) {
                     clearInterval(counterClock);
                     document.getElementById('stasis-warning-modal').style.display = 'none';
+                    hideSafeCircleNotice(); // NEW: hide notice when grace period ends
                     fireEmergencyProtocol(`Unreturned Response to Vocal Distress Intercept ("${matchedPhrase}")`);
                 }
             }, 1000);
@@ -1062,6 +1129,7 @@
             document.getElementById('threat-modal-title').innerText = "⚠️ Anomalous Stasis Trace";
             document.getElementById('threat-modal-desc').innerText = "Zero movement vector logged for more than 30s. Emergency alert sound loop initialized. Tap Stop below to halt security transmission sequence.";
             document.getElementById('stasis-warning-modal').style.display = 'flex';
+            showSafeCircleNotice(); // NEW: show the notice alongside the grace-period modal
             
             let gracePeriodSeconds = 10;
             document.getElementById('countdown-ticker').innerText = gracePeriodSeconds;
@@ -1075,6 +1143,7 @@
                 if (gracePeriodSeconds <= 0) {
                     clearInterval(counterClock);
                     document.getElementById('stasis-warning-modal').style.display = 'none';
+                    hideSafeCircleNotice(); // NEW: hide notice when grace period ends
                     fireEmergencyProtocol("Automated Static Position Target Failure Timeout");
                 }
             }, 1000);
@@ -1085,6 +1154,7 @@
             clearInterval(counterClock);
             clearInterval(stasisEvaluationLoop);
             document.getElementById('stasis-warning-modal').style.display = 'none';
+            hideSafeCircleNotice(); // NEW: make sure the notice is gone once we reach the "sent" popup
             
             if (speechRecognitionEngine) {
                 try { speechRecognitionEngine.stop(); } catch(e) {}
@@ -1098,6 +1168,7 @@
             
             const currentCoordinates = document.getElementById('telemetry-coordinates-box').innerText;
             const liveMapUrl = `https://maps.google.com/?q=${currentCoordinates.replace(/[°NE\s]/g, '').replace(',', ',')}`;
+            const contactNamesText = getSafeCircleNamesText(); // NEW
 
             const headline = document.getElementById('dynamic-alert-headline');
             const alertBorder = document.getElementById('alert-border-style');
@@ -1107,19 +1178,19 @@
             if (cause.includes("Vocal") || cause.includes("Distress") || cause.includes("HELP")) {
                 alertBorder.style.borderTopColor = "#ff66b2"; 
                 headline.innerHTML = "🗣️ AI Vocal Distress Threat Flagged";
-                smsBox.innerHTML = `"SheGuard AI Alert: Vocal distress keywords ('HELP'/'STOP') captured natively via user environment mic block! Live Tracking Coordinate Payloads: ${liveMapUrl}"`;
+                smsBox.innerHTML = `"SheGuard AI Alert: Vocal distress keywords ('HELP'/'STOP') captured natively via user environment mic block! Live Tracking Coordinate Payloads: ${liveMapUrl}" <br><br><strong>Notified: ${contactNamesText}</strong>`;
                 callBox.innerHTML = "AI Automated Priority Link: Connecting outbound audio bridge channel to Safe Circle Loop Contacts...";
                 
             } else if (cause.includes("Timeout") || cause.includes("Static") || cause.includes("Immobility")) {
                 alertBorder.style.borderTopColor = "#FFC107"; 
                 headline.innerHTML = "📍 Automated Position Stasis Alert";
-                smsBox.innerHTML = `"SheGuard Tracker Alert: Anomalous stationary posture detected! System tracking logged zero structural location change for over 30s. Verified Coordinates Pin: ${liveMapUrl}"`;
+                smsBox.innerHTML = `"SheGuard Tracker Alert: Anomalous stationary posture detected! System tracking logged zero structural location change for over 30s. Verified Coordinates Pin: ${liveMapUrl}" <br><br><strong>Notified: ${contactNamesText}</strong>`;
                 callBox.innerHTML = "Automated Dispatch Sequence: Placing background carrier warning lines loop sequence...";
                 
             } else {
                 alertBorder.style.borderTopColor = "#7a358c"; 
                 headline.innerHTML = "🚨 Emergency Interface SOS Assertion";
-                smsBox.innerHTML = `"SheGuard Manual SOS Alert: User explicitly asserted safety barrier layout boundaries! Immediate tracking payload deployed: ${liveMapUrl}"`;
+                smsBox.innerHTML = `"SheGuard Manual SOS Alert: User explicitly asserted safety barrier layout boundaries! Immediate tracking payload deployed: ${liveMapUrl}" <br><br><strong>Notified: ${contactNamesText}</strong>`;
                 callBox.innerHTML = "Trunk Link Priority Assert: Initializing multi-channel direct calls lines matrix loop...";
             }
             
@@ -1132,6 +1203,7 @@
             clearInterval(counterClock);
             document.getElementById('stasis-warning-modal').style.display = 'none';
             document.getElementById('emergency-alert-modal').style.display = 'none';
+            hideSafeCircleNotice(); // NEW: make sure the notice is cleared on Stop too
             
             const siren = document.getElementById('emergency-siren');
             siren.pause();
