@@ -3,6 +3,7 @@ const { Pool } = require('pg');
 const path = require('path');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,6 +14,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // ─── Serve static files from /public ─────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ─── Email Transporter (Gmail + App Password) ────────────────────────────────
+const mailTransporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD,
+    },
+});
 
 // ─── PostgreSQL Connection ────────────────────────────────────────────────────
 const pool = new Pool({
@@ -58,9 +68,12 @@ async function initializeDatabase() {
                 relationship TEXT,
                 phone TEXT NOT NULL,
                 backup_phone TEXT,
+                email TEXT,
                 created_at TIMESTAMP DEFAULT NOW()
             )
         `);
+        // Migrate any pre-existing contacts table (created before this change)
+        await client.query(`ALTER TABLE contacts ADD COLUMN IF NOT EXISTS email TEXT`);
         console.log('PostgreSQL database schemas initialized successfully.');
     } catch (err) {
         console.error('Database initialization error:', err);
@@ -153,8 +166,8 @@ app.post('/api/contacts/save', async (req, res) => {
         await client.query('DELETE FROM contacts WHERE user_id = $1', [userId]);
         for (const c of validContacts) {
             await client.query(
-                'INSERT INTO contacts (user_id, name, relationship, phone, backup_phone) VALUES ($1, $2, $3, $4, $5)',
-                [userId, c.name, c.relationship || '', c.phone, c.backup_phone || '']
+                'INSERT INTO contacts (user_id, name, relationship, phone, backup_phone, email) VALUES ($1, $2, $3, $4, $5, $6)',
+                [userId, c.name, c.relationship || '', c.phone, c.backup_phone || '', c.email || '']
             );
         }
         await client.query('COMMIT');
@@ -172,7 +185,7 @@ app.post('/api/contacts/save', async (req, res) => {
 app.get('/api/dashboard/data/:userId', async (req, res) => {
     try {
         const result = await pool.query(
-            'SELECT name, relationship, phone, backup_phone FROM contacts WHERE user_id = $1 ORDER BY id ASC',
+            'SELECT name, relationship, phone, backup_phone, email FROM contacts WHERE user_id = $1 ORDER BY id ASC',
             [req.params.userId]
         );
         res.json({ success: true, contacts: result.rows });
@@ -191,6 +204,51 @@ app.get('/api/user/:userId', async (req, res) => {
     } catch (err) {
         console.error('User fetch error:', err);
         res.status(500).json({ success: false, message: 'Failed to fetch user.' });
+    }
+});
+
+// 8. SEND EMERGENCY EMAIL ALERT
+app.post('/api/emergency/notify', async (req, res) => {
+    const { userId, cause, mapUrl } = req.body;
+    if (!userId) return res.status(400).json({ success: false, message: 'User ID is required.' });
+
+    try {
+        const profileResult = await pool.query('SELECT name FROM profiles WHERE user_id = $1', [userId]);
+        const userName = (profileResult.rows[0] && profileResult.rows[0].name) || 'A SafeHer user';
+
+        const contactsResult = await pool.query(
+            'SELECT name, relationship, email FROM contacts WHERE user_id = $1 AND email IS NOT NULL AND email <> \'\' ORDER BY id ASC',
+            [userId]
+        );
+
+        if (contactsResult.rows.length === 0) {
+            return res.json({ success: true, sent: 0, message: 'No contacts have an email address saved.' });
+        }
+
+        const subject = `🚨 SafeHer Emergency Alert from ${userName}`;
+        const locationLine = mapUrl ? `\n\nTheir live location: ${mapUrl}` : '';
+        const reasonLine = cause ? `\n\nReason: ${cause}` : '';
+
+        let sentCount = 0;
+        for (const contact of contactsResult.rows) {
+            const bodyText = `Hi ${contact.name},\n\n${userName} has triggered a SafeHer emergency alert and may need help.${reasonLine}${locationLine}\n\nPlease reach out to them or contact local authorities if you're unable to reach them.\n\n— Sent automatically by SafeHer`;
+            try {
+                await mailTransporter.sendMail({
+                    from: `"SafeHer Alerts" <${process.env.GMAIL_USER}>`,
+                    to: contact.email,
+                    subject: subject,
+                    text: bodyText,
+                });
+                sentCount++;
+            } catch (mailErr) {
+                console.error(`Failed to email ${contact.email}:`, mailErr.message);
+            }
+        }
+
+        res.json({ success: true, sent: sentCount, total: contactsResult.rows.length, message: `Sent ${sentCount} of ${contactsResult.rows.length} emails.` });
+    } catch (err) {
+        console.error('Emergency notify error:', err);
+        res.status(500).json({ success: false, message: 'Failed to send emergency emails.' });
     }
 });
 

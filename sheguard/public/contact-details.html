@@ -461,6 +461,13 @@
                     </div>
                 </div>
             </div>
+            <div class="field" style="margin-top:16px;">
+                <label>Email<span class="opt">Optional \u2014 needed to receive alert emails</span></label>
+                <div class="input-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z" stroke="none"></path><path d="M22 6l-10 7L2 6"></path><rect x="2" y="4" width="20" height="16" rx="2"></rect></svg>
+                    <input type="email" class="c-email" placeholder="e.g. vijay@example.com" value="${data.email || ''}">
+                </div>
+            </div>
         `;
         return card;
     }
@@ -544,7 +551,8 @@
             const relationship = card.querySelector('.c-rel').value.trim();
             const phone = card.querySelector('.c-phone').value.trim();
             const backup_phone = card.querySelector('.c-backup').value.trim();
-            dynamicContactsPool.push({ name, relationship, phone, backup_phone });
+            const email = card.querySelector('.c-email').value.trim();
+            dynamicContactsPool.push({ name, relationship, phone, backup_phone, email });
         });
 
         const validContacts = dynamicContactsPool.filter(c => c.name && c.phone);

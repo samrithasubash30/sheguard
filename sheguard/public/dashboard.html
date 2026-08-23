@@ -1306,7 +1306,31 @@
             document.getElementById('emergency-alert-modal').style.display = 'flex';
             showNotifiedPanel(); // NEW: show who was notified, separately, beside the modal
             startCallEscalation(); // NEW: simulate calling contacts one at a time, in priority order
+            sendRealEmailAlert(cause, liveMapUrl); // NEW: actually email contacts who have an email saved
             appendLogMessage(`[BROADCAST DISPATCH]: ${headline.innerText} sent successfully.`);
+        }
+
+        // NEW: sends a real email alert via the backend to any Safe Circle contact with an email saved
+        async function sendRealEmailAlert(cause, mapUrl) {
+            try {
+                const response = await fetch('/api/emergency/notify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, cause, mapUrl })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    if (result.sent > 0) {
+                        appendLogMessage(`[EMAIL]: Sent ${result.sent} of ${result.total} alert email(s).`);
+                    } else {
+                        appendLogMessage(`[EMAIL]: No contacts have an email saved yet — no emails sent.`);
+                    }
+                } else {
+                    appendLogMessage(`[EMAIL ERROR]: ${result.message || 'Failed to send alert emails.'}`);
+                }
+            } catch (err) {
+                appendLogMessage('[EMAIL ERROR]: Could not reach the server to send alert emails.');
+            }
         }
 
         function dismissEmergencySystem() {
