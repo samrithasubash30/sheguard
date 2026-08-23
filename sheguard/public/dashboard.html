@@ -872,10 +872,10 @@
 
     <div id="stasis-warning-modal" class="modal">
         <div class="modal-content" style="border-top-color: #FFC107;">
-            <h2 id="threat-modal-title" style="color:#6a1b9a; font-size:22px;">⚠️ Dynamic Threat Flagged</h2>
-            <p id="threat-modal-desc" style="margin:12px 0; color:#555; font-size:14px;">Anomalous threshold pattern registered. Emergency sound loop initialized. Tap Stop below to halt automatic contact calling pipelines.</p>
+            <h2 id="threat-modal-title" style="color:#6a1b9a; font-size:22px;">⚠️ Are You Okay?</h2>
+            <p id="threat-modal-desc" style="margin:12px 0; color:#555; font-size:14px;">An alert will be sent to your Safe Circle in a few seconds unless you cancel.</p>
             <div id="countdown-ticker" style="font-size:38px; font-weight:bold; color:#7a358c; margin:10px 0;">10</div>
-            <button class="btn-close-modal" style="background:#e91e63;" onclick="dismissEmergencySystem()">STOP // False Alarm</button>
+            <button class="btn-close-modal" style="background:#e91e63;" onclick="dismissEmergencySystem()">I'm Okay, Cancel</button>
         </div>
     </div>
 
@@ -1107,8 +1107,8 @@
             const siren = document.getElementById('emergency-siren');
             siren.play().catch(e => console.log("Audio pipeline stream blocked."));
 
-            document.getElementById('threat-modal-title').innerText = `🗣️ Vocal Threat Flagged: "${matchedPhrase}"`;
-            document.getElementById('threat-modal-desc').innerText = `Captured anchor word via system mic matrix. Siren audio executed. Tap Stop to prevent cascading emergency dispatch calling lines.`;
+            document.getElementById('threat-modal-title').innerText = `🗣️ We Heard "${matchedPhrase}"`;
+            document.getElementById('threat-modal-desc').innerText = `We think you might need help. An alert will be sent to your Safe Circle in a few seconds unless you cancel.`;
             document.getElementById('stasis-warning-modal').style.display = 'flex';
             showSafeCircleNotice(); // NEW: show the notice alongside the grace-period modal
 
@@ -1195,8 +1195,8 @@
             const siren = document.getElementById('emergency-siren');
             siren.play().catch(e => console.log("Audio asset intercept blocked."));
 
-            document.getElementById('threat-modal-title').innerText = "⚠️ Anomalous Stasis Trace";
-            document.getElementById('threat-modal-desc').innerText = "Zero movement vector logged for more than 30s. Emergency alert sound loop initialized. Tap Stop below to halt security transmission sequence.";
+            document.getElementById('threat-modal-title').innerText = "⚠️ No Movement Detected";
+            document.getElementById('threat-modal-desc').innerText = "You haven't moved in over 30 seconds. An alert will be sent to your Safe Circle in a few seconds unless you cancel.";
             document.getElementById('stasis-warning-modal').style.display = 'flex';
             showSafeCircleNotice(); // NEW: show the notice alongside the grace-period modal
             
