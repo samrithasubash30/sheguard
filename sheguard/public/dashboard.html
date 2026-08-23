@@ -477,10 +477,10 @@
             border-radius: 4px;
             padding: 12px;
             text-align: left;
-            font-family: monospace;
-            font-size: 12px;
+            font-size: 13px;
             margin-top: 12px;
             color: #232931;
+            line-height: 1.5;
         }
         .btn-close-modal {
             background: #3b1654;
@@ -522,6 +522,41 @@
             display: block;
             margin-bottom: 4px;
             font-size: 13.5px;
+        }
+
+        /* --- NOTIFIED SIDE PANEL (appears beside the alert-sent modal) --- */
+        .notified-side-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            right: 40px;
+            transform: translateY(-50%);
+            z-index: 2100;
+            background: #232931;
+            color: #ffffff;
+            padding: 16px 20px;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            border-left: 5px solid #4CAF50;
+            width: 220px;
+            text-align: left;
+            font-size: 13px;
+        }
+        .notified-side-panel strong {
+            color: #4CAF50;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14.5px;
+        }
+        .notified-side-panel .notified-name {
+            padding: 6px 0;
+            border-bottom: 1px solid #2d353f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .notified-side-panel .notified-name:last-child {
+            border-bottom: none;
         }
 
         /* ═══════════════════════════════════════
@@ -681,6 +716,15 @@
                 padding: 12px 16px;
                 font-size: 11.5px;
             }
+
+            .notified-side-panel {
+                top: auto;
+                bottom: 16px;
+                right: 50%;
+                transform: translateX(50%);
+                width: calc(100% - 60px);
+                max-width: 320px;
+            }
         }
 
         /* Very small phones */
@@ -837,21 +881,27 @@
 
     <div id="emergency-alert-modal" class="modal">
         <div class="modal-content" id="alert-border-style" style="border-top-color:#ff66b2;">
-            <h2 id="dynamic-alert-headline" style="font-size:24px; color:#3b1654;">🚨 Emergency Protocol Armed</h2>
-            <p id="alert-reason-box" style="color:#777; font-size:12px; margin-top:4px; font-style:italic; margin-bottom: 10px;"></p>
+            <h2 id="dynamic-alert-headline" style="font-size:24px; color:#3b1654;">🚨 Alert Sent</h2>
+            <p id="alert-reason-box" style="color:#777; font-size:13px; margin-top:4px; margin-bottom: 10px;"></p>
             
             <div class="popup-msg-box">
-                <strong style="color:#7a358c;">[POP-UP SMS PAYLOAD DISPATCHED]</strong><br>
-                To Verified Guardians Circle: <span id="dynamic-sms-payload-text" style="color: #232931; font-family: sans-serif; display:block; margin-top:5px; font-weight:500;">Scanning...</span>
+                <strong style="color:#7a358c;">📩 Message sent</strong>
+                <span id="dynamic-sms-payload-text" style="color: #232931; display:block; margin-top:5px; font-weight:500;">Sending...</span>
             </div>
 
             <div class="popup-msg-box" style="border-left-color: #2196F3;">
-                <strong style="color:#2196F3;">[POP-UP BACKGROUND CALL BRIDGE]</strong><br>
-                <span id="dynamic-call-payload-text">Establishing direct background cellular calling trunk channels...</span>
+                <strong style="color:#2196F3;">📞 Calling now</strong><br>
+                <span id="dynamic-call-payload-text">Trying to reach your Safe Circle by phone...</span>
             </div>
 
-            <button class="btn-close-modal" style="background:linear-gradient(to right, #7b2cbf, #ff66b2);" onclick="dismissEmergencySystem()">Reset Pipeline State</button>
+            <button class="btn-close-modal" style="background:linear-gradient(to right, #7b2cbf, #ff66b2);" onclick="dismissEmergencySystem()">I'm Safe Now</button>
         </div>
+    </div>
+
+    <!-- NEW: Notified side panel — appears alongside the alert-sent modal -->
+    <div id="notified-side-panel" class="notified-side-panel">
+        <strong>✅ Notified</strong>
+        <div id="notified-side-panel-list"></div>
     </div>
 
     <script>
@@ -926,6 +976,25 @@
         // NEW: hides the floating toast
         function hideSafeCircleNotice() {
             document.getElementById('safe-circle-notice-toast').style.display = 'none';
+        }
+
+        // NEW: shows the side panel listing who was notified, once the alert has actually fired
+        function showNotifiedPanel() {
+            const panel = document.getElementById('notified-side-panel');
+            const listEl = document.getElementById('notified-side-panel-list');
+            if (safeCircleContacts && safeCircleContacts.length > 0) {
+                listEl.innerHTML = safeCircleContacts
+                    .map(c => `<div class="notified-name">✔️ ${c.name}${c.relationship ? ' (' + c.relationship + ')' : ''}</div>`)
+                    .join('');
+            } else {
+                listEl.innerHTML = `<div class="notified-name">No contacts saved yet</div>`;
+            }
+            panel.style.display = 'block';
+        }
+
+        // NEW: hides the side panel
+        function hideNotifiedPanel() {
+            document.getElementById('notified-side-panel').style.display = 'none';
         }
 
         // ── LOAD REAL CONTACTS FROM DATABASE ──────────────────────────────────
@@ -1163,39 +1232,42 @@
             document.getElementById('emergency-siren').pause();
             
             document.getElementById('status-signal-dot').className = "status-dot-pulse alerted";
-            document.getElementById('status-signal-text').innerText = "CRITICAL PACKETS TRANSMITTED";
-            document.getElementById('alert-reason-box').innerText = `Verified Source: ${cause}`;
+            document.getElementById('status-signal-text').innerText = "Alert Sent";
             
             const currentCoordinates = document.getElementById('telemetry-coordinates-box').innerText;
             const liveMapUrl = `https://maps.google.com/?q=${currentCoordinates.replace(/[°NE\s]/g, '').replace(',', ',')}`;
-            const contactNamesText = getSafeCircleNamesText(); // NEW
 
             const headline = document.getElementById('dynamic-alert-headline');
             const alertBorder = document.getElementById('alert-border-style');
+            const reasonBox = document.getElementById('alert-reason-box');
             const smsBox = document.getElementById('dynamic-sms-payload-text');
             const callBox = document.getElementById('dynamic-call-payload-text');
 
             if (cause.includes("Vocal") || cause.includes("Distress") || cause.includes("HELP")) {
                 alertBorder.style.borderTopColor = "#ff66b2"; 
-                headline.innerHTML = "🗣️ AI Vocal Distress Threat Flagged";
-                smsBox.innerHTML = `"SheGuard AI Alert: Vocal distress keywords ('HELP'/'STOP') captured natively via user environment mic block! Live Tracking Coordinate Payloads: ${liveMapUrl}" <br><br><strong>Notified: ${contactNamesText}</strong>`;
-                callBox.innerHTML = "AI Automated Priority Link: Connecting outbound audio bridge channel to Safe Circle Loop Contacts...";
+                headline.innerHTML = "🗣️ Voice Alert Sent";
+                reasonBox.innerText = "We heard a distress word and sent this alert automatically.";
+                smsBox.innerHTML = `We heard you say "help" or "stop" and shared your live location: <a href="${liveMapUrl}" target="_blank">${liveMapUrl}</a>`;
+                callBox.innerHTML = "Trying to reach your Safe Circle by phone...";
                 
             } else if (cause.includes("Timeout") || cause.includes("Static") || cause.includes("Immobility")) {
                 alertBorder.style.borderTopColor = "#FFC107"; 
-                headline.innerHTML = "📍 Automated Position Stasis Alert";
-                smsBox.innerHTML = `"SheGuard Tracker Alert: Anomalous stationary posture detected! System tracking logged zero structural location change for over 30s. Verified Coordinates Pin: ${liveMapUrl}" <br><br><strong>Notified: ${contactNamesText}</strong>`;
-                callBox.innerHTML = "Automated Dispatch Sequence: Placing background carrier warning lines loop sequence...";
+                headline.innerHTML = "📍 Location Alert Sent";
+                reasonBox.innerText = "We noticed you haven't moved in over 30 seconds.";
+                smsBox.innerHTML = `No movement detected for 30+ seconds. Your live location: <a href="${liveMapUrl}" target="_blank">${liveMapUrl}</a>`;
+                callBox.innerHTML = "Trying to reach your Safe Circle by phone...";
                 
             } else {
                 alertBorder.style.borderTopColor = "#7a358c"; 
-                headline.innerHTML = "🚨 Emergency Interface SOS Assertion";
-                smsBox.innerHTML = `"SheGuard Manual SOS Alert: User explicitly asserted safety barrier layout boundaries! Immediate tracking payload deployed: ${liveMapUrl}" <br><br><strong>Notified: ${contactNamesText}</strong>`;
-                callBox.innerHTML = "Trunk Link Priority Assert: Initializing multi-channel direct calls lines matrix loop...";
+                headline.innerHTML = "🚨 SOS Alert Sent";
+                reasonBox.innerText = "You pressed the SOS button.";
+                smsBox.innerHTML = `Your live location has been shared: <a href="${liveMapUrl}" target="_blank">${liveMapUrl}</a>`;
+                callBox.innerHTML = "Trying to reach your Safe Circle by phone...";
             }
             
             document.getElementById('emergency-alert-modal').style.display = 'flex';
-            appendLogMessage(`[BROADCAST DISPATCH]: ${headline.innerText} payloads sent into system pipelines successfully.`);
+            showNotifiedPanel(); // NEW: show who was notified, separately, beside the modal
+            appendLogMessage(`[BROADCAST DISPATCH]: ${headline.innerText} sent successfully.`);
         }
 
         function dismissEmergencySystem() {
@@ -1204,6 +1276,7 @@
             document.getElementById('stasis-warning-modal').style.display = 'none';
             document.getElementById('emergency-alert-modal').style.display = 'none';
             hideSafeCircleNotice(); // NEW: make sure the notice is cleared on Stop too
+            hideNotifiedPanel(); // NEW: hide the notified side panel too
             
             const siren = document.getElementById('emergency-siren');
             siren.pause();
