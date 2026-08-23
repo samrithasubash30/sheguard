@@ -1124,7 +1124,7 @@
 
             speechRecognitionEngine.onend = function() {
                 if (!isEmergencyTriggered) {
-                    speechRecognitionEngine.start();
+                    try { speechRecognitionEngine.start(); } catch (e) {}
                 }
             };
 
