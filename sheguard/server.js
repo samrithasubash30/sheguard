@@ -323,9 +323,17 @@ function escapeXml(text) {
 }
 
 app.get('/api/twiml/emergency-call', (req, res) => {
-    const name = escapeXml(req.query.name || 'A SafeHer user');
-    const cause = req.query.cause ? ` The reason given was: ${escapeXml(req.query.cause)}.` : '';
-    const message = `This is an automated emergency alert from Safe Her. ${name} may need your help.${cause} Please check on them as soon as possible. This message will now repeat.`;
+    const name = escapeXml(req.query.name || 'a SafeHer user');
+    const causeText = req.query.cause ? escapeXml(req.query.cause) : null;
+
+    let situationLine;
+    if (causeText) {
+        situationLine = `This alert was triggered because: ${causeText}.`;
+    } else {
+        situationLine = `This alert was triggered from their SafeHer app.`;
+    }
+
+    const message = `Hello. This is an automated safety call from SafeHer. ${name} has triggered an emergency alert and may need urgent help. ${situationLine} Please try calling ${name} right away, or check the SafeHer app for their live location. If you cannot reach them, please consider contacting local authorities. This message will now repeat.`;
 
     res.type('text/xml');
     res.send(`<?xml version="1.0" encoding="UTF-8"?>
