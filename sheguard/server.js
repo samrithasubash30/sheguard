@@ -4,6 +4,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
+const twilio = require('twilio');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,6 +27,11 @@ const mailTransporter = nodemailer.createTransport({
     greetingTimeout: 8000,
     socketTimeout: 8000,
 });
+
+// ─── SMS Client (Twilio) ───────────────────────────────────────────────────────
+const twilioClient = (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN)
+    ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+    : null;
 
 // ─── PostgreSQL Connection ────────────────────────────────────────────────────
 const pool = new Pool({
@@ -220,21 +226,19 @@ app.post('/api/emergency/notify', async (req, res) => {
         const userName = (profileResult.rows[0] && profileResult.rows[0].name) || 'A SafeHer user';
 
         const contactsResult = await pool.query(
-            'SELECT name, relationship, email FROM contacts WHERE user_id = $1 AND email IS NOT NULL AND email <> \'\' ORDER BY id ASC',
+            'SELECT name, relationship, phone, email FROM contacts WHERE user_id = $1 ORDER BY id ASC',
             [userId]
         );
 
-        if (contactsResult.rows.length === 0) {
-            return res.json({ success: true, sent: 0, message: 'No contacts have an email address saved.' });
-        }
-
-        const subject = `🚨 SafeHer Emergency Alert from ${userName}`;
         const locationLine = mapUrl ? `\n\nTheir live location: ${mapUrl}` : '';
         const reasonLine = cause ? `\n\nReason: ${cause}` : '';
 
-        let sentCount = 0;
-        let lastError = null;
-        for (const contact of contactsResult.rows) {
+        // ── EMAIL (Gmail/Nodemailer) ──────────────────────────────────────────
+        const emailContacts = contactsResult.rows.filter(c => c.email && c.email.trim() !== '');
+        const subject = `🚨 SafeHer Emergency Alert from ${userName}`;
+        let emailSentCount = 0;
+        let emailLastError = null;
+        for (const contact of emailContacts) {
             const bodyText = `Hi ${contact.name},\n\n${userName} has triggered a SafeHer emergency alert and may need help.${reasonLine}${locationLine}\n\nPlease reach out to them or contact local authorities if you're unable to reach them.\n\n— Sent automatically by SafeHer`;
             try {
                 await mailTransporter.sendMail({
@@ -243,24 +247,93 @@ app.post('/api/emergency/notify', async (req, res) => {
                     subject: subject,
                     text: bodyText,
                 });
-                sentCount++;
+                emailSentCount++;
             } catch (mailErr) {
                 console.error(`Failed to email ${contact.email}:`, mailErr.message);
-                lastError = mailErr.message;
+                emailLastError = mailErr.message;
+            }
+        }
+
+        // ── SMS (Twilio) ──────────────────────────────────────────────────────
+        const phoneContacts = contactsResult.rows.filter(c => c.phone && c.phone.trim() !== '');
+        let smsSentCount = 0;
+        let smsLastError = null;
+
+        if (!twilioClient) {
+            smsLastError = 'Twilio is not configured on the server.';
+        } else if (!process.env.TWILIO_PHONE_NUMBER) {
+            smsLastError = 'TWILIO_PHONE_NUMBER is not set on the server.';
+        } else {
+            for (const contact of phoneContacts) {
+                const smsText = `SafeHer Alert: ${userName} may need help.${reasonLine}${locationLine}`;
+                try {
+                    await twilioClient.messages.create({
+                        body: smsText,
+                        from: process.env.TWILIO_PHONE_NUMBER,
+                        to: contact.phone,
+                    });
+                    smsSentCount++;
+                } catch (smsErr) {
+                    console.error(`Failed to SMS ${contact.phone}:`, smsErr.message);
+                    smsLastError = smsErr.message;
+                }
+            }
+        }
+
+        // ── VOICE CALL (Twilio) — real call to the top-priority contact only ───
+        let callStatus = null;
+        const topContact = phoneContacts[0];
+
+        if (topContact) {
+            if (!twilioClient) {
+                callStatus = { placed: false, to: topContact.name, error: 'Twilio is not configured on the server.' };
+            } else if (!process.env.TWILIO_PHONE_NUMBER) {
+                callStatus = { placed: false, to: topContact.name, error: 'TWILIO_PHONE_NUMBER is not set on the server.' };
+            } else {
+                try {
+                    const twimlUrl = `https://${req.get('host')}/api/twiml/emergency-call?name=${encodeURIComponent(userName)}${cause ? `&cause=${encodeURIComponent(cause)}` : ''}`;
+                    await twilioClient.calls.create({
+                        url: twimlUrl,
+                        from: process.env.TWILIO_PHONE_NUMBER,
+                        to: topContact.phone,
+                    });
+                    callStatus = { placed: true, to: topContact.name };
+                } catch (callErr) {
+                    console.error(`Failed to call ${topContact.phone}:`, callErr.message);
+                    callStatus = { placed: false, to: topContact.name, error: callErr.message };
+                }
             }
         }
 
         res.json({
             success: true,
-            sent: sentCount,
-            total: contactsResult.rows.length,
-            error: sentCount === 0 ? lastError : null,
-            message: `Sent ${sentCount} of ${contactsResult.rows.length} emails.`
+            email: { sent: emailSentCount, total: emailContacts.length, error: emailSentCount === 0 ? emailLastError : null },
+            sms: { sent: smsSentCount, total: phoneContacts.length, error: smsSentCount === 0 ? smsLastError : null },
+            call: callStatus,
         });
     } catch (err) {
         console.error('Emergency notify error:', err);
-        res.status(500).json({ success: false, message: 'Failed to send emergency emails.' });
+        res.status(500).json({ success: false, message: 'Failed to send emergency alerts.' });
     }
+});
+
+// 9. TWIML FOR EMERGENCY VOICE CALL — tells Twilio what to say when the call connects
+function escapeXml(text) {
+    return String(text).replace(/[<>&'"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]));
+}
+
+app.get('/api/twiml/emergency-call', (req, res) => {
+    const name = escapeXml(req.query.name || 'A SafeHer user');
+    const cause = req.query.cause ? ` The reason given was: ${escapeXml(req.query.cause)}.` : '';
+    const message = `This is an automated emergency alert from Safe Her. ${name} may need your help.${cause} Please check on them as soon as possible. This message will now repeat.`;
+
+    res.type('text/xml');
+    res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Say voice="Polly.Joanna">${message}</Say>
+    <Pause length="1"/>
+    <Say voice="Polly.Joanna">${message}</Say>
+</Response>`);
 });
 
 // ─── PAGE ROUTES ──────────────────────────────────────────────────────────────

@@ -1306,12 +1306,12 @@
             document.getElementById('emergency-alert-modal').style.display = 'flex';
             showNotifiedPanel(); // NEW: show who was notified, separately, beside the modal
             startCallEscalation(); // NEW: simulate calling contacts one at a time, in priority order
-            sendRealEmailAlert(cause, liveMapUrl); // NEW: actually email contacts who have an email saved
+            sendRealAlerts(cause, liveMapUrl); // NEW: sends real email (Gmail) and SMS (Twilio) alerts
             appendLogMessage(`[BROADCAST DISPATCH]: ${headline.innerText} sent successfully.`);
         }
 
         // NEW: sends a real email alert via the backend to any Safe Circle contact with an email saved
-        async function sendRealEmailAlert(cause, mapUrl) {
+        async function sendRealAlerts(cause, mapUrl) {
             try {
                 const response = await fetch('/api/emergency/notify', {
                     method: 'POST',
@@ -1319,19 +1319,40 @@
                     body: JSON.stringify({ userId, cause, mapUrl })
                 });
                 const result = await response.json();
-                if (result.success) {
-                    if (result.total === 0) {
-                        appendLogMessage(`[EMAIL]: No contacts have an email saved yet — no emails sent.`);
-                    } else if (result.sent > 0) {
-                        appendLogMessage(`[EMAIL]: Sent ${result.sent} of ${result.total} alert email(s).`);
-                    } else {
-                        appendLogMessage(`[EMAIL ERROR]: Failed to send. ${result.error || 'Unknown error.'}`);
-                    }
+
+                if (!result.success) {
+                    appendLogMessage(`[ALERT ERROR]: ${result.message || 'Failed to send emergency alerts.'}`);
+                    return;
+                }
+
+                // Email results
+                if (result.email.total === 0) {
+                    appendLogMessage(`[EMAIL]: No contacts have an email saved — no emails sent.`);
+                } else if (result.email.sent > 0) {
+                    appendLogMessage(`[EMAIL]: Sent ${result.email.sent} of ${result.email.total} alert email(s).`);
                 } else {
-                    appendLogMessage(`[EMAIL ERROR]: ${result.message || 'Failed to send alert emails.'}`);
+                    appendLogMessage(`[EMAIL ERROR]: ${result.email.error || 'Unknown error.'}`);
+                }
+
+                // SMS results
+                if (result.sms.total === 0) {
+                    appendLogMessage(`[SMS]: No contacts have a phone number saved — no texts sent.`);
+                } else if (result.sms.sent > 0) {
+                    appendLogMessage(`[SMS]: Sent ${result.sms.sent} of ${result.sms.total} alert text(s).`);
+                } else {
+                    appendLogMessage(`[SMS ERROR]: ${result.sms.error || 'Unknown error.'}`);
+                }
+
+                // Real voice call result (to top-priority contact only)
+                if (result.call) {
+                    if (result.call.placed) {
+                        appendLogMessage(`[REAL CALL]: Placing an actual phone call to ${result.call.to}.`);
+                    } else {
+                        appendLogMessage(`[REAL CALL ERROR]: ${result.call.error || 'Could not place the call.'}`);
+                    }
                 }
             } catch (err) {
-                appendLogMessage('[EMAIL ERROR]: Could not reach the server to send alert emails.');
+                appendLogMessage('[ALERT ERROR]: Could not reach the server to send alerts.');
             }
         }
 
