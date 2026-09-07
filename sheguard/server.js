@@ -338,9 +338,9 @@ app.get('/api/twiml/emergency-call', (req, res) => {
     res.type('text/xml');
     res.send(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Say voice="Polly.Joanna">${message}</Say>
+    <Say>${message}</Say>
     <Pause length="1"/>
-    <Say voice="Polly.Joanna">${message}</Say>
+    <Say>${message}</Say>
 </Response>`);
 });
 
