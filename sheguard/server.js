@@ -291,7 +291,8 @@ app.post('/api/emergency/notify', async (req, res) => {
                 callStatus = { placed: false, to: topContact.name, error: 'TWILIO_PHONE_NUMBER is not set on the server.' };
             } else {
                 try {
-                    const twimlUrl = `https://${req.get('host')}/api/twiml/emergency-call?name=${encodeURIComponent(userName)}${cause ? `&cause=${encodeURIComponent(cause)}` : ''}`;
+                    const baseUrl = process.env.APP_BASE_URL || `https://${req.get('host')}`;
+                    const twimlUrl = `${baseUrl}/api/twiml/emergency-call?name=${encodeURIComponent(userName)}${cause ? `&cause=${encodeURIComponent(cause)}` : ''}`;
                     await twilioClient.calls.create({
                         url: twimlUrl,
                         from: process.env.TWILIO_PHONE_NUMBER,
