@@ -295,6 +295,7 @@ app.post('/api/emergency/notify', async (req, res) => {
                     const twimlUrl = `${baseUrl}/api/twiml/emergency-call?name=${encodeURIComponent(userName)}${cause ? `&cause=${encodeURIComponent(cause)}` : ''}`;
                     await twilioClient.calls.create({
                         url: twimlUrl,
+                        method: 'GET',
                         from: process.env.TWILIO_PHONE_NUMBER,
                         to: topContact.phone,
                     });
