@@ -295,7 +295,6 @@ app.post('/api/emergency/notify', async (req, res) => {
                     const twimlUrl = `${baseUrl}/api/twiml/emergency-call?name=${encodeURIComponent(userName)}${cause ? `&cause=${encodeURIComponent(cause)}` : ''}`;
                     await twilioClient.calls.create({
                         url: twimlUrl,
-                        method: 'GET',
                         from: process.env.TWILIO_PHONE_NUMBER,
                         to: topContact.phone,
                     });
@@ -324,9 +323,10 @@ function escapeXml(text) {
     return String(text).replace(/[<>&'"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]));
 }
 
-app.get('/api/twiml/emergency-call', (req, res) => {
-    const name = escapeXml(req.query.name || 'a SafeHer user');
-    const causeText = req.query.cause ? escapeXml(req.query.cause) : null;
+function handleEmergencyCallTwiml(req, res) {
+    const params = { ...req.query, ...req.body };
+    const name = escapeXml(params.name || 'a SafeHer user');
+    const causeText = params.cause ? escapeXml(params.cause) : null;
 
     let situationLine;
     if (causeText) {
@@ -344,7 +344,10 @@ app.get('/api/twiml/emergency-call', (req, res) => {
     <Pause length="1"/>
     <Say>${message}</Say>
 </Response>`);
-});
+}
+
+app.get('/api/twiml/emergency-call', handleEmergencyCallTwiml);
+app.post('/api/twiml/emergency-call', handleEmergencyCallTwiml);
 
 // ─── PAGE ROUTES ──────────────────────────────────────────────────────────────
 // Splash screen is the entry point
