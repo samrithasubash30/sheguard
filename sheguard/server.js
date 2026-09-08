@@ -284,7 +284,13 @@ app.post('/api/emergency/notify', async (req, res) => {
                         smsSentCount++;
                     } else {
                         console.error(`Failed to SMS ${contact.phone} via Fast2SMS:`, JSON.stringify(result));
-                        smsLastError = (result.message && result.message.join(', ')) || 'Fast2SMS rejected the request.';
+                        if (Array.isArray(result.message)) {
+                            smsLastError = result.message.join(', ');
+                        } else if (typeof result.message === 'string' && result.message.trim() !== '') {
+                            smsLastError = result.message;
+                        } else {
+                            smsLastError = 'Fast2SMS rejected the request.';
+                        }
                     }
                 } catch (smsErr) {
                     console.error(`Failed to SMS ${contact.phone} via Fast2SMS:`, smsErr.message);
