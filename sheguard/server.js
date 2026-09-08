@@ -254,27 +254,40 @@ app.post('/api/emergency/notify', async (req, res) => {
             }
         }
 
-        // ── SMS (Twilio) ──────────────────────────────────────────────────────
+        // ── SMS (Fast2SMS — Quick SMS route, no DLT registration needed) ───────
         const phoneContacts = contactsResult.rows.filter(c => c.phone && c.phone.trim() !== '');
         let smsSentCount = 0;
         let smsLastError = null;
 
-        if (!twilioClient) {
-            smsLastError = 'Twilio is not configured on the server.';
-        } else if (!process.env.TWILIO_PHONE_NUMBER) {
-            smsLastError = 'TWILIO_PHONE_NUMBER is not set on the server.';
+        if (!process.env.FAST2SMS_API_KEY) {
+            smsLastError = 'FAST2SMS_API_KEY is not set on the server.';
         } else {
+            const smsText = `SafeHer Alert: ${userName} may need help.${reasonLine}${locationLine}`;
             for (const contact of phoneContacts) {
-                const smsText = `SafeHer Alert: ${userName} may need help.${reasonLine}${locationLine}`;
+                // Fast2SMS Quick SMS route expects plain 10-digit Indian numbers (no +91 prefix)
+                const plainNumber = contact.phone.replace(/[^0-9]/g, '').slice(-10);
                 try {
-                    await twilioClient.messages.create({
-                        body: smsText,
-                        from: process.env.TWILIO_PHONE_NUMBER,
-                        to: contact.phone,
+                    const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': process.env.FAST2SMS_API_KEY,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            route: 'q',
+                            message: smsText,
+                            numbers: plainNumber,
+                        }),
                     });
-                    smsSentCount++;
+                    const result = await response.json();
+                    if (result.return === true) {
+                        smsSentCount++;
+                    } else {
+                        console.error(`Failed to SMS ${contact.phone} via Fast2SMS:`, JSON.stringify(result));
+                        smsLastError = (result.message && result.message.join(', ')) || 'Fast2SMS rejected the request.';
+                    }
                 } catch (smsErr) {
-                    console.error(`Failed to SMS ${contact.phone}:`, smsErr.message);
+                    console.error(`Failed to SMS ${contact.phone} via Fast2SMS:`, smsErr.message);
                     smsLastError = smsErr.message;
                 }
             }
