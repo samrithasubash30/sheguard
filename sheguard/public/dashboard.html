@@ -4,30 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SHEGUARD - Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root{
+            --ink:#161B2E;
+            --ink-soft:#232941;
+            --ink-line:#2E3552;
+            --paper:#FAF6EE;
+            --paper-dim:#F1EBDD;
+            --ember:#E0932F;
+            --ember-deep:#B5701E;
+            --berry:#B23A5B;
+            --moss:#4B7368;
+            --mist:#8B90A8;
+            --line:#E4DCC9;
+            --ink-text:#2B2E3D;
+        }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Work Sans', sans-serif;
         }
 
         body {
             display: flex;
-            background-color: #f7f5fa;
+            background-color: var(--paper);
             height: 100vh;
             overflow: hidden;
+        }
+
+        h1, h2, h3, h4, .brand-name, .emergency-header h2 {
+            font-family: 'Fraunces', serif;
         }
 
         /* --- SIDEBAR STYLING --- */
         .sidebar {
             width: 250px;
-            background-color: #1a1f24;
+            background-color: var(--ink);
             display: flex;
             flex-direction: column;
             padding: 30px 0 15px 0;
-            color: #a0a5b0;
-            border-right: 1px solid #15191c;
+            color: var(--mist);
+            border-right: 1px solid var(--ink-line);
             justify-content: space-between;
         }
 
@@ -40,8 +60,8 @@
         }
 
         .brand-logo-placeholder {
-            width: 65px;
-            height: 65px;
+            width: 56px;
+            height: 56px;
             background-color: transparent;
             margin-bottom: 10px;
             display: flex;
@@ -51,11 +71,10 @@
         }
 
         .brand-name {
-            color: #d1b3ff;
-            font-size: 16px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+            color: var(--paper);
+            font-size: 17px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
         }
 
         .menu-list {
@@ -67,23 +86,25 @@
             display: flex;
             align-items: center;
             padding: 12px 25px;
-            color: #9299a6;
+            color: var(--mist);
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 500;
-            transition: all 0.3s ease;
-            gap: 15px;
+            transition: all 0.2s ease;
+            gap: 13px;
         }
+
+        .menu-item a svg { width: 17px; height: 17px; flex-shrink: 0; opacity: .85; }
 
         .menu-item.active a {
             color: #ffffff;
-            background-color: #232931;
-            border-left: 4px solid #7a358c;
+            background-color: var(--ink-soft);
+            border-left: 3px solid var(--ember);
         }
 
         .menu-item a:hover {
             color: #ffffff;
-            background-color: #232931;
+            background-color: var(--ink-soft);
         }
 
         .menu-icon-placeholder {
@@ -95,23 +116,22 @@
         /* Presenter Controls Sidebar Box */
         .presenter-deck {
             margin-top: auto;
-            border-top: 1px solid #2d353f;
+            border-top: 1px solid var(--ink-line);
             padding: 15px 20px 0 20px;
         }
         .presenter-title {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #5c6270;
+            font-size: 10.5px;
+            letter-spacing: 0.6px;
+            color: #5F6480;
             margin-bottom: 10px;
-            font-weight: bold;
+            font-weight: 600;
         }
         .sim-btn {
             width: 100%;
-            background: #232931;
-            border: 1px solid #2d353f;
+            background: var(--ink-soft);
+            border: 1px solid var(--ink-line);
             padding: 10px 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             text-align: left;
             color: #fff;
             cursor: pointer;
@@ -120,14 +140,15 @@
             transition: 0.2s;
         }
         .sim-btn:hover {
-            background: #2c343e;
-            border-color: #7a358c;
+            background: #2c3350;
+            border-color: var(--ember);
         }
         .sim-btn strong {
             display: block;
-            color: #ff66b2;
+            color: var(--ember);
             font-size: 12px;
             margin-bottom: 2px;
+            font-weight: 600;
         }
 
         /* --- MAIN CONTENT WINDOW --- */
@@ -135,13 +156,13 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            background-color: #ffffff;
+            background-color: var(--paper);
             position: relative;
         }
 
         .top-accent-bar {
-            height: 35px;
-            background-color: #6a1b9a;
+            height: 36px;
+            background-color: var(--ink);
             width: 100%;
             display: flex;
             justify-content: space-between;
@@ -152,29 +173,31 @@
         .system-status-pouch {
             font-size: 12px;
             color: #ffffff;
-            font-weight: 600;
+            font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
         }
 
         .status-dot-pulse {
-            width: 8px;
-            height: 8px;
-            background-color: #4CAF50;
+            width: 7px;
+            height: 7px;
+            background-color: var(--moss);
             border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(75,115,104,0.25);
         }
 
         .status-dot-pulse.alerted {
-            background-color: #ff66b2;
+            background-color: var(--berry);
+            box-shadow: 0 0 0 3px rgba(178,58,91,0.28);
         }
 
         .profile-pic-placeholder {
             width: 26px;
             height: 26px;
             border-radius: 50%;
-            background-color: #e0e0e0;
-            border: 1px solid #ffffff;
+            background-color: var(--ink-soft);
+            border: 1px solid rgba(255,255,255,0.2);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -192,7 +215,7 @@
         .user-greeting {
             font-size: 12px;
             color: #ffffff;
-            font-weight: 600;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -215,18 +238,19 @@
         }
 
         .emergency-header h2 {
-            color: #3b1654;
-            font-size: 32px;
-            font-weight: 600;
+            color: var(--ink);
+            font-size: 30px;
+            font-weight: 500;
             margin-bottom: 5px;
+            letter-spacing: -0.2px;
         }
 
         .emergency-header p {
-            color: #555555;
-            font-size: 14px;
+            color: #6B6F85;
+            font-size: 13.5px;
         }
 
-        /* Massive SOS Button Layout */
+        /* Massive SOS Button Layout — the one deliberate hero moment */
         .sos-container {
             display: flex;
             justify-content: center;
@@ -237,36 +261,43 @@
         .sos-ripple-outer {
             width: 190px;
             height: 190px;
-            background-color: rgba(122, 53, 140, 0.15);
+            background: radial-gradient(circle, rgba(178,58,91,0.10) 0%, rgba(178,58,91,0.03) 70%, transparent 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: breathe 3.2s ease-in-out infinite;
+        }
+
+        .sos-ripple-middle {
+            width: 158px;
+            height: 158px;
+            background-color: rgba(178,58,91,0.09);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .sos-ripple-middle {
-            width: 160px;
-            height: 160px;
-            background-color: rgba(122, 53, 140, 0.3);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.045); }
         }
 
         .sos-button {
             width: 130px;
             height: 130px;
-            background-color: #7a358c;
+            background: linear-gradient(155deg, var(--berry) 0%, #8F2C48 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #ffffff;
-            font-size: 26px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(122, 53, 140, 0.4);
+            font-family: 'Fraunces', serif;
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 24px rgba(178,58,91,0.38), inset 0 1px 0 rgba(255,255,255,0.15);
             cursor: pointer;
             user-select: none;
             transition: 0.2s;
@@ -275,7 +306,7 @@
             transform: scale(0.96);
         }
 
-        /* Grid Cards Section */
+        /* Grid Cards Section — deliberately not-identical treatment */
         .cards-grid {
             display: grid;
             grid-template-columns: 1.1fr 1.1fr 1.4fr 1.4fr;
@@ -288,10 +319,10 @@
 
         .card {
             background-color: #ffffff;
-            border-radius: 12px;
+            border-radius: 10px;
             padding: 15px 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            border: 1px solid #f0f0f2;
+            box-shadow: 0 2px 10px rgba(22,27,46,0.05);
+            border: 1px solid var(--line);
             height: 185px;
             overflow: hidden;
         }
@@ -306,41 +337,55 @@
             transition: border 0.2s, transform 0.2s;
         }
         .action-card:hover {
-            border-color: #7a358c;
+            border-color: var(--ember);
             transform: translateY(-2px);
         }
 
         .action-icon-placeholder {
-            width: 50px;
-            height: 50px;
-            background-color: transparent;
+            width: 44px;
+            height: 44px;
+            background-color: var(--paper-dim);
+            border-radius: 50%;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 32px;
+            color: var(--ember-deep);
         }
+        .action-icon-placeholder svg { width: 22px; height: 22px; }
 
         .action-card h3 {
-            color: #333333;
-            font-size: 18px;
+            color: var(--ink-text);
+            font-size: 16px;
             font-weight: 600;
             margin-bottom: 4px;
         }
         .action-card p {
             font-size: 12px;
-            color: #666;
+            color: #6B6F85;
             word-break: break-all;
             padding: 0 5px;
         }
 
         .panel-card h4 {
-            color: #333333;
-            font-size: 14px;
+            color: var(--ink-text);
+            font-size: 13.5px;
             font-weight: 600;
             margin-bottom: 10px;
-            border-bottom: 1px solid #f5f5f7;
-            padding-bottom: 5px;
+            border-bottom: 1px solid var(--paper-dim);
+            padding-bottom: 8px;
+            font-family: 'Fraunces', serif;
+        }
+
+        /* Logs card: quiet terminal treatment for intentional variation */
+        .panel-card.log-card {
+            background: var(--ink);
+            border-color: var(--ink-line);
+        }
+        .panel-card.log-card h4 {
+            color: var(--paper);
+            border-bottom-color: var(--ink-line);
         }
 
         .list-container-scroll {
@@ -352,8 +397,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 6px 0;
-            border-bottom: 1px solid #f9f9fa;
+            padding: 7px 0;
+            border-bottom: 1px solid var(--paper-dim);
         }
 
         .list-item:last-child {
@@ -367,24 +412,26 @@
         }
 
         .avatar-placeholder {
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
-            background-color: #e5e5e7;
+            background-color: var(--paper-dim);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 13px;
+            color: var(--ember-deep);
+            font-weight: 600;
         }
 
         .item-info h5 {
-            color: #444444;
+            color: var(--ink-text);
             font-size: 13px;
             font-weight: 500;
         }
 
         .item-info p {
-            color: #888888;
+            color: #9A9DAD;
             font-size: 10px;
         }
 
@@ -394,10 +441,10 @@
         }
 
         .mini-icon-btn-placeholder {
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            background-color: #f1e6f5;
+            background-color: var(--paper-dim);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -405,17 +452,17 @@
         }
 
         .timestamp {
-            color: #999999;
+            color: #9A9DAD;
             font-size: 10px;
             white-space: nowrap;
         }
 
         /* --- BOTTOM CONTROL NAV BAR --- */
         .bottom-nav {
-            height: 50px;
-            background-color: #3b1654;
-            border-top-left-radius: 25px;
-            border-top-right-radius: 25px;
+            height: 52px;
+            background-color: var(--ink);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
             width: calc(100% - 40px);
             margin: 0 auto;
             display: flex;
@@ -429,13 +476,14 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: #bfa3d4;
+            color: var(--mist);
             text-decoration: none;
             font-size: 10px;
+            gap: 3px;
         }
 
         .bottom-nav-item.active {
-            color: #ffffff;
+            color: var(--ember);
         }
 
         .bottom-icon-placeholder {
@@ -447,6 +495,7 @@
             justify-content: center;
             font-size: 12px;
         }
+        .bottom-icon-placeholder svg { width: 16px; height: 16px; }
 
         /* --- MODAL POP-UPS --- */
         .modal {
@@ -456,48 +505,48 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(22,27,46,0.72);
             z-index: 2000;
             justify-content: center;
             align-items: center;
         }
         .modal-content {
-            background: #ffffff;
-            border-radius: 16px;
+            background: var(--paper);
+            border-radius: 14px;
             width: 100%;
             max-width: 480px;
             padding: 30px;
-            border-top: 6px solid #7a358c;
+            border-top: 5px solid var(--ember);
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.35);
         }
         .popup-msg-box {
-            background: #f4f5f7;
-            border-left: 4px solid #7a358c;
-            border-radius: 4px;
+            background: #ffffff;
+            border-left: 3px solid var(--ember);
+            border-radius: 6px;
             padding: 12px;
             text-align: left;
             font-size: 13px;
             margin-top: 12px;
-            color: #232931;
+            color: var(--ink-text);
             line-height: 1.5;
         }
         .btn-close-modal {
-            background: #3b1654;
-            color: white;
-            padding: 10px 25px;
+            background: var(--ink);
+            color: var(--paper);
+            padding: 11px 26px;
             border: none;
-            border-radius: 20px;
+            border-radius: 24px;
             cursor: pointer;
             margin-top: 20px;
             font-weight: 600;
             font-size: 13px;
         }
         .btn-close-modal:hover {
-            background: #5c258d;
+            background: var(--ink-soft);
         }
 
-        /* --- SAFE CIRCLE NOTICE TOAST (shown alongside the grace-period modal) --- */
+        /* --- SAFE CIRCLE NOTICE TOAST --- */
         .safe-circle-toast {
             display: none;
             position: fixed;
@@ -505,12 +554,12 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 2100;
-            background: #232931;
+            background: var(--ink);
             color: #ffffff;
             padding: 14px 22px;
-            border-radius: 14px;
+            border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            border-left: 5px solid #ff66b2;
+            border-left: 4px solid var(--ember);
             max-width: 420px;
             width: calc(100% - 40px);
             text-align: left;
@@ -518,13 +567,14 @@
             line-height: 1.5;
         }
         .safe-circle-toast strong {
-            color: #ff66b2;
+            color: var(--ember);
             display: block;
             margin-bottom: 4px;
             font-size: 13.5px;
+            font-weight: 600;
         }
 
-        /* --- NOTIFIED SIDE PANEL (appears beside the alert-sent modal) --- */
+        /* --- NOTIFIED SIDE PANEL --- */
         .notified-side-panel {
             display: none;
             position: fixed;
@@ -532,25 +582,26 @@
             right: 40px;
             transform: translateY(-50%);
             z-index: 2100;
-            background: #232931;
+            background: var(--ink);
             color: #ffffff;
             padding: 16px 20px;
-            border-radius: 14px;
+            border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            border-left: 5px solid #4CAF50;
+            border-left: 4px solid var(--moss);
             width: 220px;
             text-align: left;
             font-size: 13px;
         }
         .notified-side-panel strong {
-            color: #4CAF50;
+            color: var(--moss);
             display: block;
             margin-bottom: 10px;
-            font-size: 14.5px;
+            font-size: 14px;
+            font-weight: 600;
         }
         .notified-side-panel .notified-name {
             padding: 6px 0;
-            border-bottom: 1px solid #2d353f;
+            border-bottom: 1px solid var(--ink-line);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -563,186 +614,58 @@
            MOBILE RESPONSIVE — Full Fix
         ═══════════════════════════════════════ */
         @media (max-width: 768px) {
-
-            /* Body stacks vertically on mobile */
             body {
                 flex-direction: column;
                 height: 100dvh;
                 overflow: hidden;
             }
-
-            /* Hide sidebar on mobile — use bottom nav instead */
-            .sidebar {
-                display: none;
-            }
-
-            /* Mobile top bar */
-            .top-accent-bar {
-                height: 45px;
-                padding: 0 15px;
-            }
-
-            .system-status-pouch {
-                font-size: 11px;
-            }
-
-            /* Dashboard body full width */
-            .main-window {
-                width: 100%;
-                height: 100dvh;
-                flex: 1;
-            }
-
+            .sidebar { display: none; }
+            .top-accent-bar { height: 45px; padding: 0 15px; }
+            .system-status-pouch { font-size: 11px; }
+            .main-window { width: 100%; height: 100dvh; flex: 1; }
             .dashboard-body {
                 padding: 15px 15px 10px 15px;
                 overflow-y: auto;
                 justify-content: flex-start;
                 gap: 12px;
             }
-
-            /* Smaller header */
-            .emergency-header h2 {
-                font-size: 22px;
-                margin-bottom: 4px;
-            }
-
-            .emergency-header p {
-                font-size: 12px;
-            }
-
-            /* SOS button smaller on mobile */
-            .sos-ripple-outer {
-                width: 160px;
-                height: 160px;
-            }
-
-            .sos-ripple-middle {
-                width: 130px;
-                height: 130px;
-            }
-
-            .sos-button {
-                width: 105px;
-                height: 105px;
-                font-size: 22px;
-            }
-
-            .sos-container {
-                margin: 8px 0;
-            }
-
-            /* Cards: 2 columns on mobile */
-            .cards-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
-                margin-bottom: 10px;
-            }
-
-            .card {
-                height: 150px;
-                padding: 12px;
-            }
-
-            .action-card h3 {
-                font-size: 13px;
-            }
-
-            .action-icon-placeholder {
-                font-size: 24px;
-                margin-bottom: 6px;
-                width: 36px;
-                height: 36px;
-            }
-
-            .action-card p {
-                font-size: 10px;
-            }
-
-            .panel-card h4 {
-                font-size: 12px;
-            }
-
-            .list-container-scroll {
-                height: 100px;
-            }
-
-            .item-info h5 {
-                font-size: 11px;
-            }
-
-            .item-info p {
-                font-size: 9px;
-            }
-
-            /* Bottom nav full width */
+            .emergency-header h2 { font-size: 21px; margin-bottom: 4px; }
+            .emergency-header p { font-size: 12px; }
+            .sos-ripple-outer { width: 160px; height: 160px; }
+            .sos-ripple-middle { width: 130px; height: 130px; }
+            .sos-button { width: 105px; height: 105px; font-size: 20px; }
+            .sos-container { margin: 8px 0; }
+            .cards-grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+            .card { height: 150px; padding: 12px; }
+            .action-card h3 { font-size: 13px; }
+            .action-icon-placeholder { font-size: 24px; margin-bottom: 6px; width: 36px; height: 36px; }
+            .action-card p { font-size: 10px; }
+            .panel-card h4 { font-size: 12px; }
+            .list-container-scroll { height: 100px; }
+            .item-info h5 { font-size: 11px; }
+            .item-info p { font-size: 9px; }
             .bottom-nav {
-                width: 100%;
-                border-radius: 0;
-                height: 56px;
-                gap: 0;
-                justify-content: space-around;
-                margin: 0;
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                z-index: 100;
+                width: 100%; border-radius: 0; height: 56px; gap: 0;
+                justify-content: space-around; margin: 0;
+                position: fixed; bottom: 0; left: 0; z-index: 100;
             }
-
-            .bottom-nav-item {
-                font-size: 9px;
-                flex: 1;
-                padding: 4px 0;
-            }
-
-            .bottom-icon-placeholder {
-                font-size: 18px;
-                margin-bottom: 2px;
-            }
-
-            /* Modal fix for mobile */
-            .modal-content {
-                margin: 15px;
-                padding: 20px;
-                max-width: calc(100vw - 30px);
-            }
-
-            .popup-msg-box {
-                font-size: 11px;
-                word-break: break-all;
-            }
-
-            .safe-circle-toast {
-                top: 12px;
-                padding: 12px 16px;
-                font-size: 11.5px;
-            }
-
+            .bottom-nav-item { font-size: 9px; flex: 1; padding: 4px 0; }
+            .bottom-icon-placeholder { font-size: 18px; margin-bottom: 2px; }
+            .modal-content { margin: 15px; padding: 20px; max-width: calc(100vw - 30px); }
+            .popup-msg-box { font-size: 11px; word-break: break-all; }
+            .safe-circle-toast { top: 12px; padding: 12px 16px; font-size: 11.5px; }
             .notified-side-panel {
-                top: auto;
-                bottom: 16px;
-                right: 50%;
-                transform: translateX(50%);
-                width: calc(100% - 60px);
-                max-width: 320px;
+                top: auto; bottom: 16px; right: 50%; transform: translateX(50%);
+                width: calc(100% - 60px); max-width: 320px;
             }
         }
 
-        /* Very small phones */
         @media (max-width: 380px) {
-            .cards-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 8px;
-            }
-
-            .card {
-                height: 130px;
-                padding: 10px;
-            }
-
+            .cards-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .card { height: 130px; padding: 10px; }
             .sos-ripple-outer { width: 140px; height: 140px; }
             .sos-ripple-middle { width: 114px; height: 114px; }
-            .sos-button { width: 90px; height: 90px; font-size: 20px; }
-
+            .sos-button { width: 90px; height: 90px; font-size: 18px; }
             .emergency-header h2 { font-size: 18px; }
         }
     </style>
@@ -752,10 +675,10 @@
     <audio id="emergency-siren" src="siren.mp3" loop preload="auto"></audio>
 
     <div id="init-interaction-modal" class="modal" style="display: flex;">
-        <div class="modal-content" style="border-top-color: #6a1b9a;">
-            <h2 style="color:#3b1654; font-size: 22px; margin-bottom: 10px;">Security Verification Required</h2>
+        <div class="modal-content" style="border-top-color: #161B2E;">
+            <h2 style="color:#161B2E; font-size: 22px; margin-bottom: 10px;">Security Verification Required</h2>
             <p style="color:#555; font-size: 14px; margin-bottom: 15px;">Initialize the SheGuard client environment hooks, speech algorithms, and device audio pipelines now.</p>
-            <button class="btn-close-modal" style="background: #7a358c; width: 100%; margin-top: 5px; padding: 14px;" onclick="bootDashboardPipeline()">Initialize Monitoring System</button>
+            <button class="btn-close-modal" style="background: #161B2E; width: 100%; margin-top: 5px; padding: 14px;" onclick="bootDashboardPipeline()">Initialize Monitoring System</button>
         </div>
     </div>
 
@@ -767,22 +690,22 @@
         <ul class="menu-list">
             <li class="menu-item active">
                 <a href="#">
-                    <span class="menu-icon-placeholder">🏠</span> Home
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path></svg> Home
                 </a>
             </li>
             <li class="menu-item">
                 <a href="contact-details.html">
-                    <span class="menu-icon-placeholder">👥</span> Contacts
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Contacts
                 </a>
             </li>
             <li class="menu-item">
                 <a href="profile-details.html">
-                    <span class="menu-icon-placeholder">👤</span> Profile
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Profile
                 </a>
             </li>
             <li class="menu-item">
                 <a href="#" onclick="handleLogout()">
-                    <span class="menu-icon-placeholder">🚪</span> Log Out
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg> Log Out
                 </a>
             </li>
         </ul>
@@ -829,15 +752,15 @@
             <div class="cards-grid">
                 
                 <div class="card action-card" onclick="startContinuousSpeechRecognition()">
-                    <div class="action-icon-placeholder">🎙️</div>
+                    <div class="action-icon-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg></div>
                     <h3>Audio Core State</h3>
                     <p id="audio-state-text" style="color:#888; font-weight:500;">Awaiting alignment...</p>
                 </div>
 
                 <div class="card action-card" onclick="window.location.href='live-map.html'">
-                    <div class="action-icon-placeholder">📍</div>
+                    <div class="action-icon-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
                     <h3>Live Coordinates</h3>
-                    <p id="telemetry-coordinates-box" style="font-weight: 600; color: #7a358c;">Locating...</p>
+                    <p id="telemetry-coordinates-box" style="font-weight: 600; color: #161B2E;">Locating...</p>
                     <p style="font-size: 10px; color: #999; margin-top: 4px;">Click to track on roads map</p>
                 </div>
 
@@ -848,9 +771,9 @@
                     </div>
                 </div>
 
-                <div class="card panel-card">
+                <div class="card panel-card log-card">
                     <h4>Execution Stream Logs</h4>
-                    <div class="list-container-scroll" id="terminal-stream-box" style="font-family:monospace; font-size:11px; color:#333; line-height:1.4; padding-right: 5px;">
+                    <div class="list-container-scroll" id="terminal-stream-box" style="font-family:'Courier New',monospace; font-size:11px; color:#C7CBE0; line-height:1.5; padding-right: 5px;">
                         [SYSTEM] Frame offline. Click initialization prompt banner...
                     </div>
                 </div>
@@ -858,8 +781,8 @@
             </div>
 
             <nav class="bottom-nav">
-                <a href="index.html" class="bottom-nav-item active"><div class="bottom-icon-placeholder">🏠</div>Home</a>
-                <a href="live-map.html" class="bottom-nav-item"><div class="bottom-icon-placeholder">⭕</div>Location Map</a>
+                <a href="index.html" class="bottom-nav-item active"><div class="bottom-icon-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path></svg></div>Home</a>
+                <a href="live-map.html" class="bottom-nav-item"><div class="bottom-icon-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>Location Map</a>
             </nav>
         </div>
     </main>
@@ -871,30 +794,30 @@
     </div>
 
     <div id="stasis-warning-modal" class="modal">
-        <div class="modal-content" style="border-top-color: #FFC107;">
-            <h2 id="threat-modal-title" style="color:#6a1b9a; font-size:22px;">⚠️ Are You Okay?</h2>
+        <div class="modal-content" style="border-top-color: #E0932F;">
+            <h2 id="threat-modal-title" style="color:#161B2E; font-size:22px;">⚠️ Are You Okay?</h2>
             <p id="threat-modal-desc" style="margin:12px 0; color:#555; font-size:14px;">An alert will be sent to your Safe Circle in a few seconds unless you cancel.</p>
-            <div id="countdown-ticker" style="font-size:38px; font-weight:bold; color:#7a358c; margin:10px 0;">10</div>
-            <button class="btn-close-modal" style="background:#e91e63;" onclick="dismissEmergencySystem()">I'm Okay, Cancel</button>
+            <div id="countdown-ticker" style="font-size:38px; font-weight:bold; color:#161B2E; margin:10px 0;">10</div>
+            <button class="btn-close-modal" style="background:#B23A5B;" onclick="dismissEmergencySystem()">I'm Okay, Cancel</button>
         </div>
     </div>
 
     <div id="emergency-alert-modal" class="modal">
-        <div class="modal-content" id="alert-border-style" style="border-top-color:#ff66b2;">
-            <h2 id="dynamic-alert-headline" style="font-size:24px; color:#3b1654;">🚨 Alert Sent</h2>
+        <div class="modal-content" id="alert-border-style" style="border-top-color:#B23A5B;">
+            <h2 id="dynamic-alert-headline" style="font-size:24px; color:#161B2E;">🚨 Alert Sent</h2>
             <p id="alert-reason-box" style="color:#777; font-size:13px; margin-top:4px; margin-bottom: 10px;"></p>
             
             <div class="popup-msg-box">
-                <strong style="color:#7a358c;">📩 Message sent</strong>
-                <span id="dynamic-sms-payload-text" style="color: #232931; display:block; margin-top:5px; font-weight:500;">Sending...</span>
+                <strong style="color:#161B2E;">📩 Message sent</strong>
+                <span id="dynamic-sms-payload-text" style="color: #2B2E3D; display:block; margin-top:5px; font-weight:500;">Sending...</span>
             </div>
 
-            <div class="popup-msg-box" style="border-left-color: #2196F3;">
-                <strong style="color:#2196F3;">📞 Calling now</strong><br>
+            <div class="popup-msg-box" style="border-left-color: #4B7368;">
+                <strong style="color:#4B7368;">📞 Calling now</strong><br>
                 <span id="dynamic-call-payload-text">Trying to reach your Safe Circle by phone...</span>
             </div>
 
-            <button class="btn-close-modal" style="background:linear-gradient(to right, #7b2cbf, #ff66b2);" onclick="dismissEmergencySystem()">I'm Safe Now</button>
+            <button class="btn-close-modal" style="background:#4B7368;" onclick="dismissEmergencySystem()">I'm Safe Now</button>
         </div>
     </div>
 
@@ -1070,7 +993,7 @@
                     appendLogMessage(`[SERVER SYNC]: Loaded ${result.contacts.length} verified contacts from database.`);
                 } else {
                     safeCircleContacts = []; // NEW
-                    listEl.innerHTML = '<div style="color:#aaa; font-size:12px; text-align:center; margin-top:30px; padding:0 10px;">No contacts saved yet.<br><a href="contact-details.html" style="color:#ff66b2;">Add contacts →</a></div>';
+                    listEl.innerHTML = '<div style="color:#aaa; font-size:12px; text-align:center; margin-top:30px; padding:0 10px;">No contacts saved yet.<br><a href="contact-details.html" style="color:#B23A5B;">Add contacts →</a></div>';
                     appendLogMessage('[SERVER SYNC]: No contacts found in database for this user.');
                 }
             } catch (err) {
@@ -1084,7 +1007,7 @@
             
             document.getElementById('status-signal-text').innerText = "AI Guard: Active & Monitoring";
             document.getElementById('audio-state-text').innerText = "Listening for vocal anchors";
-            document.getElementById('audio-state-text').style.color = "#4CAF50";
+            document.getElementById('audio-state-text').style.color = "#4B7368";
             
             const displayBox = document.getElementById('terminal-stream-box');
             displayBox.innerHTML = "[SYSTEM] Initial frameworks bound.<br>[SYSTEM] Interaction established. Audio stream tokens unlocked.";
@@ -1103,7 +1026,7 @@
             if (!window.SpeechRecognition) {
                 appendLogMessage("Acoustic Error: Speech Recognition API not supported natively on this browser context.");
                 document.getElementById('audio-state-text').innerText = "Microphone Module Error";
-                document.getElementById('audio-state-text').style.color = "#e91e63";
+                document.getElementById('audio-state-text').style.color = "#B23A5B";
                 return;
             }
 
@@ -1285,19 +1208,19 @@
             const smsBox = document.getElementById('dynamic-sms-payload-text');
 
             if (cause.includes("Vocal") || cause.includes("Distress") || cause.includes("HELP")) {
-                alertBorder.style.borderTopColor = "#ff66b2"; 
+                alertBorder.style.borderTopColor = "#B23A5B"; 
                 headline.innerHTML = "🗣️ Voice Alert Sent";
                 reasonBox.innerText = "We heard a distress word and sent this alert automatically.";
                 smsBox.innerHTML = `We heard you say "help" or "stop" and shared your live location: <a href="${liveMapUrl}" target="_blank">${liveMapUrl}</a>`;
                 
             } else if (cause.includes("Timeout") || cause.includes("Static") || cause.includes("Immobility")) {
-                alertBorder.style.borderTopColor = "#FFC107"; 
+                alertBorder.style.borderTopColor = "#E0932F"; 
                 headline.innerHTML = "📍 Location Alert Sent";
                 reasonBox.innerText = "We noticed you haven't moved in over 30 seconds.";
                 smsBox.innerHTML = `No movement detected for 30+ seconds. Your live location: <a href="${liveMapUrl}" target="_blank">${liveMapUrl}</a>`;
                 
             } else {
-                alertBorder.style.borderTopColor = "#7a358c"; 
+                alertBorder.style.borderTopColor = "#161B2E"; 
                 headline.innerHTML = "🚨 SOS Alert Sent";
                 reasonBox.innerText = "You pressed the SOS button.";
                 smsBox.innerHTML = `Your live location has been shared: <a href="${liveMapUrl}" target="_blank">${liveMapUrl}</a>`;
@@ -1334,13 +1257,13 @@
                     appendLogMessage(`[EMAIL ERROR]: ${result.email.error || 'Unknown error.'}`);
                 }
 
-                // SMS results
-                if (result.sms.total === 0) {
-                    appendLogMessage(`[SMS]: No contacts have a phone number saved — no texts sent.`);
-                } else if (result.sms.sent > 0) {
-                    appendLogMessage(`[SMS]: Sent ${result.sms.sent} of ${result.sms.total} alert text(s).`);
+                // WhatsApp (CallMeBot) results
+                if (result.whatsapp.total === 0) {
+                    appendLogMessage(`[WHATSAPP]: No contacts have a CallMeBot key saved — no WhatsApp alerts sent.`);
+                } else if (result.whatsapp.sent > 0) {
+                    appendLogMessage(`[WHATSAPP]: Sent ${result.whatsapp.sent} of ${result.whatsapp.total} alert message(s).`);
                 } else {
-                    appendLogMessage(`[SMS ERROR]: ${result.sms.error || 'Unknown error.'}`);
+                    appendLogMessage(`[WHATSAPP ERROR]: ${result.whatsapp.error || 'Unknown error.'}`);
                 }
 
                 // Real voice call result (to top-priority contact only)
@@ -1372,7 +1295,7 @@
             document.getElementById('status-signal-dot').className = "status-dot-pulse";
             document.getElementById('status-signal-text').innerText = "AI Guard: Active & Monitoring";
             document.getElementById('audio-state-text').innerText = "Listening for vocal anchors";
-            document.getElementById('audio-state-text').style.color = "#4CAF50";
+            document.getElementById('audio-state-text').style.color = "#4B7368";
             
             stationarySecondsCount = 0;
             appendLogMessage("[PIPELINE RESET]: Reset algorithms context layout back to baseline.");
@@ -1385,7 +1308,7 @@
 
         function triggerVoiceSimulation() {
             document.getElementById('audio-state-text').innerText = "Matched Command: 'HELP!'";
-            document.getElementById('audio-state-text').style.color = "#ff66b2";
+            document.getElementById('audio-state-text').style.color = "#B23A5B";
             appendLogMessage("Simulation Deck: Injecting mock voice event string frame validation logic.");
             fireEmergencyProtocol("Vocal Trigger Pattern Event Match");
         }

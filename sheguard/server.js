@@ -78,11 +78,13 @@ async function initializeDatabase() {
                 phone TEXT NOT NULL,
                 backup_phone TEXT,
                 email TEXT,
+                callmebot_apikey TEXT,
                 created_at TIMESTAMP DEFAULT NOW()
             )
         `);
         // Migrate any pre-existing contacts table (created before this change)
         await client.query(`ALTER TABLE contacts ADD COLUMN IF NOT EXISTS email TEXT`);
+        await client.query(`ALTER TABLE contacts ADD COLUMN IF NOT EXISTS callmebot_apikey TEXT`);
         console.log('PostgreSQL database schemas initialized successfully.');
     } catch (err) {
         console.error('Database initialization error:', err);
@@ -175,8 +177,8 @@ app.post('/api/contacts/save', async (req, res) => {
         await client.query('DELETE FROM contacts WHERE user_id = $1', [userId]);
         for (const c of validContacts) {
             await client.query(
-                'INSERT INTO contacts (user_id, name, relationship, phone, backup_phone, email) VALUES ($1, $2, $3, $4, $5, $6)',
-                [userId, c.name, c.relationship || '', c.phone, c.backup_phone || '', c.email || '']
+                'INSERT INTO contacts (user_id, name, relationship, phone, backup_phone, email, callmebot_apikey) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+                [userId, c.name, c.relationship || '', c.phone, c.backup_phone || '', c.email || '', c.callmebot_apikey || '']
             );
         }
         await client.query('COMMIT');
@@ -194,7 +196,7 @@ app.post('/api/contacts/save', async (req, res) => {
 app.get('/api/dashboard/data/:userId', async (req, res) => {
     try {
         const result = await pool.query(
-            'SELECT name, relationship, phone, backup_phone, email FROM contacts WHERE user_id = $1 ORDER BY id ASC',
+            'SELECT name, relationship, phone, backup_phone, email, callmebot_apikey FROM contacts WHERE user_id = $1 ORDER BY id ASC',
             [req.params.userId]
         );
         res.json({ success: true, contacts: result.rows });
@@ -226,7 +228,7 @@ app.post('/api/emergency/notify', async (req, res) => {
         const userName = (profileResult.rows[0] && profileResult.rows[0].name) || 'A SafeHer user';
 
         const contactsResult = await pool.query(
-            'SELECT name, relationship, phone, email FROM contacts WHERE user_id = $1 ORDER BY id ASC',
+            'SELECT name, relationship, phone, email, callmebot_apikey FROM contacts WHERE user_id = $1 ORDER BY id ASC',
             [userId]
         );
 
@@ -254,47 +256,32 @@ app.post('/api/emergency/notify', async (req, res) => {
             }
         }
 
-        // ── SMS (Fast2SMS — Quick SMS route, no DLT registration needed) ───────
+        // ── WHATSAPP (CallMeBot — free, per-recipient opt-in, no monthly fee) ──
         const phoneContacts = contactsResult.rows.filter(c => c.phone && c.phone.trim() !== '');
-        let smsSentCount = 0;
-        let smsLastError = null;
+        const whatsappContacts = contactsResult.rows.filter(c => c.callmebot_apikey && c.callmebot_apikey.trim() !== '');
+        let whatsappSentCount = 0;
+        let whatsappLastError = null;
 
-        if (!process.env.FAST2SMS_API_KEY) {
-            smsLastError = 'FAST2SMS_API_KEY is not set on the server.';
+        if (whatsappContacts.length === 0) {
+            whatsappLastError = 'No contacts have a CallMeBot API key saved.';
         } else {
-            const smsText = `SafeHer Alert: ${userName} may need help.${reasonLine}${locationLine}`;
-            for (const contact of phoneContacts) {
-                // Fast2SMS Quick SMS route expects plain 10-digit Indian numbers (no +91 prefix)
-                const plainNumber = contact.phone.replace(/[^0-9]/g, '').slice(-10);
+            const whatsappText = `SafeHer Alert: ${userName} may need help.${reasonLine}${locationLine}`;
+            for (const contact of whatsappContacts) {
+                // CallMeBot expects the phone number with country code, e.g. 91XXXXXXXXXX (no + or spaces)
+                const plainNumber = contact.phone.replace(/[^0-9]/g, '');
+                const url = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(plainNumber)}&text=${encodeURIComponent(whatsappText)}&apikey=${encodeURIComponent(contact.callmebot_apikey.trim())}`;
                 try {
-                    const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': process.env.FAST2SMS_API_KEY,
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            route: 'q',
-                            message: smsText,
-                            numbers: plainNumber,
-                        }),
-                    });
-                    const result = await response.json();
-                    if (result.return === true) {
-                        smsSentCount++;
+                    const response = await fetch(url, { method: 'GET' });
+                    const bodyText = await response.text();
+                    if (response.ok && !/error/i.test(bodyText)) {
+                        whatsappSentCount++;
                     } else {
-                        console.error(`Failed to SMS ${contact.phone} via Fast2SMS:`, JSON.stringify(result));
-                        if (Array.isArray(result.message)) {
-                            smsLastError = result.message.join(', ');
-                        } else if (typeof result.message === 'string' && result.message.trim() !== '') {
-                            smsLastError = result.message;
-                        } else {
-                            smsLastError = 'Fast2SMS rejected the request.';
-                        }
+                        console.error(`Failed to WhatsApp ${contact.phone} via CallMeBot:`, bodyText);
+                        whatsappLastError = bodyText || 'CallMeBot rejected the request.';
                     }
-                } catch (smsErr) {
-                    console.error(`Failed to SMS ${contact.phone} via Fast2SMS:`, smsErr.message);
-                    smsLastError = smsErr.message;
+                } catch (waErr) {
+                    console.error(`Failed to WhatsApp ${contact.phone} via CallMeBot:`, waErr.message);
+                    whatsappLastError = waErr.message;
                 }
             }
         }
@@ -328,7 +315,7 @@ app.post('/api/emergency/notify', async (req, res) => {
         res.json({
             success: true,
             email: { sent: emailSentCount, total: emailContacts.length, error: emailSentCount === 0 ? emailLastError : null },
-            sms: { sent: smsSentCount, total: phoneContacts.length, error: smsSentCount === 0 ? smsLastError : null },
+            whatsapp: { sent: whatsappSentCount, total: whatsappContacts.length, error: whatsappSentCount === 0 ? whatsappLastError : null },
             call: callStatus,
         });
     } catch (err) {
