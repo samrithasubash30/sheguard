@@ -1233,7 +1233,7 @@
             appendLogMessage(`[BROADCAST DISPATCH]: ${headline.innerText} sent successfully.`);
         }
 
-        // NEW: sends a real email alert via the backend to any Safe Circle contact with an email saved
+        // NEW: sends a real SMS alert (Fast2SMS) via the backend to Safe Circle contacts
         async function sendRealAlerts(cause, mapUrl) {
             try {
                 const response = await fetch('/api/emergency/notify', {
@@ -1248,22 +1248,13 @@
                     return;
                 }
 
-                // Email results
-                if (result.email.total === 0) {
-                    appendLogMessage(`[EMAIL]: No contacts have an email saved — no emails sent.`);
-                } else if (result.email.sent > 0) {
-                    appendLogMessage(`[EMAIL]: Sent ${result.email.sent} of ${result.email.total} alert email(s).`);
+                // SMS results
+                if (result.sms.total === 0) {
+                    appendLogMessage(`[SMS]: No contacts have a phone number saved — no texts sent.`);
+                } else if (result.sms.sent > 0) {
+                    appendLogMessage(`[SMS]: Sent ${result.sms.sent} of ${result.sms.total} alert text(s).`);
                 } else {
-                    appendLogMessage(`[EMAIL ERROR]: ${result.email.error || 'Unknown error.'}`);
-                }
-
-                // WhatsApp (CallMeBot) results
-                if (result.whatsapp.total === 0) {
-                    appendLogMessage(`[WHATSAPP]: No contacts have a CallMeBot key saved — no WhatsApp alerts sent.`);
-                } else if (result.whatsapp.sent > 0) {
-                    appendLogMessage(`[WHATSAPP]: Sent ${result.whatsapp.sent} of ${result.whatsapp.total} alert message(s).`);
-                } else {
-                    appendLogMessage(`[WHATSAPP ERROR]: ${result.whatsapp.error || 'Unknown error.'}`);
+                    appendLogMessage(`[SMS ERROR]: ${result.sms.error || 'Unknown error.'}`);
                 }
 
                 // Real voice call result (to top-priority contact only)
