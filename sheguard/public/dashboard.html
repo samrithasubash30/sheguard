@@ -858,6 +858,9 @@
 
         let counterClock;
         let stasisEvaluationLoop;
+        let currentPos = null;      // full-precision latest GPS fix
+        let trackToken = null;      // live-tracking session token
+        let trackTimer = null;
         let lastKnownLat = null;
         let lastKnownLon = null;
         let stationarySecondsCount = 0;
@@ -1101,6 +1104,7 @@
                 appendLogMessage("GPS Core: Requesting coordinate permissions...");
                 
                 navigator.geolocation.watchPosition(position => {
+                    currentPos = { lat: position.coords.latitude, lon: position.coords.longitude, accuracy: position.coords.accuracy };
                     const lat = position.coords.latitude.toFixed(4);
                     const lon = position.coords.longitude.toFixed(4);
                     
@@ -1229,7 +1233,7 @@
             document.getElementById('emergency-alert-modal').style.display = 'flex';
             showNotifiedPanel(); // NEW: show who was notified, separately, beside the modal
             startCallEscalation(); // NEW: simulate calling contacts one at a time, in priority order
-            sendRealAlerts(cause, liveMapUrl); // NEW: sends real email (Gmail) and SMS (Twilio) alerts
+            sendRealAlerts(cause, liveMapUrl); // sends real SMS (Fast2SMS) with a live tracking link
             appendLogMessage(`[BROADCAST DISPATCH]: ${headline.innerText} sent successfully.`);
         }
 
@@ -1239,13 +1243,26 @@
                 const response = await fetch('/api/emergency/notify', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId, cause, mapUrl })
+                    body: JSON.stringify({
+                        userId, cause, mapUrl,
+                        lat: currentPos ? currentPos.lat : (lastKnownLat ? parseFloat(lastKnownLat) : null),
+                        lon: currentPos ? currentPos.lon : (lastKnownLon ? parseFloat(lastKnownLon) : null)
+                    })
                 });
                 const result = await response.json();
 
                 if (!result.success) {
                     appendLogMessage(`[ALERT ERROR]: ${result.message || 'Failed to send emergency alerts.'}`);
                     return;
+                }
+
+                // Live tracking session
+                if (result.token) {
+                    startLiveTracking(result.token);
+                    const smsBox = document.getElementById('dynamic-sms-payload-text');
+                    if (smsBox && result.trackUrl) {
+                        smsBox.innerHTML = `Your live location is being shared: <a href="${result.trackUrl}" target="_blank">${result.trackUrl}</a>`;
+                    }
                 }
 
                 // SMS results
@@ -1270,7 +1287,37 @@
             }
         }
 
+        // ── LIVE TRACKING: push position to the server every 5s while the alert is active ──
+        function startLiveTracking(token) {
+            stopLiveTracking(false);
+            trackToken = token;
+            appendLogMessage('[LIVE TRACKING]: Sharing live location with your Safe Circle.');
+            const push = () => {
+                if (!trackToken || !currentPos) return;
+                fetch('/api/alert/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: trackToken, lat: currentPos.lat, lon: currentPos.lon, accuracy: currentPos.accuracy })
+                }).catch(() => {});
+            };
+            trackTimer = setInterval(push, 5000);
+        }
+
+        function stopLiveTracking(notifyServer = true) {
+            if (trackTimer) { clearInterval(trackTimer); trackTimer = null; }
+            if (trackToken && notifyServer) {
+                fetch('/api/alert/end', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: trackToken })
+                }).catch(() => {});
+                appendLogMessage('[LIVE TRACKING]: Location sharing stopped.');
+            }
+            trackToken = null;
+        }
+
         function dismissEmergencySystem() {
+            stopLiveTracking(true);
             isEmergencyTriggered = false;
             clearInterval(counterClock);
             document.getElementById('stasis-warning-modal').style.display = 'none';

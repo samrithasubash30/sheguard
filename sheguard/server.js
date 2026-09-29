@@ -4,6 +4,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const twilio = require('twilio');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -65,6 +66,19 @@ async function initializeDatabase() {
                 phone TEXT NOT NULL,
                 backup_phone TEXT,
                 created_at TIMESTAMP DEFAULT NOW()
+            )
+        `);
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS alerts (
+                token TEXT PRIMARY KEY,
+                user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+                lat DOUBLE PRECISION,
+                lon DOUBLE PRECISION,
+                accuracy DOUBLE PRECISION,
+                ended BOOLEAN DEFAULT FALSE,
+                started_at TIMESTAMP DEFAULT NOW(),
+                updated_at TIMESTAMP DEFAULT NOW(),
+                expires_at TIMESTAMP NOT NULL
             )
         `);
         console.log('PostgreSQL database schemas initialized successfully.');
@@ -202,10 +216,25 @@ app.get('/api/user/:userId', async (req, res) => {
 
 // 8. SEND EMERGENCY ALERTS (SMS + real voice call)
 app.post('/api/emergency/notify', async (req, res) => {
-    const { userId, cause, mapUrl } = req.body;
+    const { userId, cause, lat, lon } = req.body;
+    let { mapUrl } = req.body;
     if (!userId) return res.status(400).json({ success: false, message: 'User ID is required.' });
 
     try {
+        // Create a live-tracking session with a secret, unguessable token (expires in 2 hours)
+        let trackToken = null;
+        const latNum = parseFloat(lat), lonNum = parseFloat(lon);
+        if (!isNaN(latNum) && !isNaN(lonNum)) {
+            trackToken = crypto.randomBytes(16).toString('hex');
+            await pool.query(
+                `INSERT INTO alerts (token, user_id, lat, lon, expires_at)
+                 VALUES ($1, $2, $3, $4, NOW() + INTERVAL '2 hours')`,
+                [trackToken, userId, latNum, lonNum]
+            );
+            const base = process.env.APP_BASE_URL || `https://${req.get('host')}`;
+            mapUrl = `${base.replace(/\/$/, '')}/track/${trackToken}`;
+        }
+
         const profileResult = await pool.query('SELECT name FROM profiles WHERE user_id = $1', [userId]);
         const userName = (profileResult.rows[0] && profileResult.rows[0].name) || 'A SafeHer user';
 
@@ -214,7 +243,7 @@ app.post('/api/emergency/notify', async (req, res) => {
             [userId]
         );
 
-        const locationLine = mapUrl ? `\n\nTheir live location: ${mapUrl}` : '';
+        const locationLine = mapUrl ? `\n\nTrack live: ${mapUrl}` : '';
         const reasonLine = cause ? `\n\nReason: ${cause}` : '';
 
         // ── SMS (Fast2SMS — Quick SMS route, no DLT registration needed) ───────
@@ -290,6 +319,8 @@ app.post('/api/emergency/notify', async (req, res) => {
 
         res.json({
             success: true,
+            token: trackToken,
+            trackUrl: mapUrl || null,
             sms: { sent: smsSentCount, total: phoneContacts.length, error: smsSentCount === 0 ? smsLastError : null },
             call: callStatus,
         });
@@ -297,6 +328,66 @@ app.post('/api/emergency/notify', async (req, res) => {
         console.error('Emergency notify error:', err);
         res.status(500).json({ success: false, message: 'Failed to send emergency alerts.' });
     }
+});
+
+// 8b. LIVE TRACKING — the dashboard pushes position updates (token = proof of ownership)
+app.post('/api/alert/update', async (req, res) => {
+    const { token, lat, lon, accuracy } = req.body;
+    const latNum = parseFloat(lat), lonNum = parseFloat(lon);
+    if (!token || isNaN(latNum) || isNaN(lonNum)) return res.status(400).json({ success: false });
+    try {
+        const r = await pool.query(
+            `UPDATE alerts SET lat = $2, lon = $3, accuracy = $4, updated_at = NOW()
+             WHERE token = $1 AND ended = FALSE AND expires_at > NOW()`,
+            [token, latNum, lonNum, isNaN(parseFloat(accuracy)) ? null : parseFloat(accuracy)]
+        );
+        res.json({ success: r.rowCount > 0 });
+    } catch (err) {
+        console.error('Alert update error:', err);
+        res.status(500).json({ success: false });
+    }
+});
+
+app.post('/api/alert/end', async (req, res) => {
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ success: false });
+    try {
+        await pool.query('UPDATE alerts SET ended = TRUE WHERE token = $1', [token]);
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Alert end error:', err);
+        res.status(500).json({ success: false });
+    }
+});
+
+// 8c. LIVE TRACKING — public read by secret token (used by the contact's tracking page)
+app.get('/api/track/:token', async (req, res) => {
+    if (!/^[a-f0-9]{32}$/.test(req.params.token)) return res.status(404).json({ success: false });
+    try {
+        const r = await pool.query(
+            `SELECT a.lat, a.lon, a.accuracy, a.ended, a.updated_at, a.started_at,
+                    (a.expires_at < NOW()) AS expired, p.name
+             FROM alerts a LEFT JOIN profiles p ON p.user_id = a.user_id
+             WHERE a.token = $1`, [req.params.token]);
+        if (r.rows.length === 0) return res.status(404).json({ success: false });
+        const a = r.rows[0];
+        res.set('Cache-Control', 'no-store');
+        res.json({
+            success: true,
+            name: a.name || 'A SafeHer user',
+            lat: a.lat, lon: a.lon, accuracy: a.accuracy,
+            active: !a.ended && !a.expired,
+            ended: a.ended, expired: a.expired,
+            updatedAt: a.updated_at, startedAt: a.started_at,
+        });
+    } catch (err) {
+        console.error('Track fetch error:', err);
+        res.status(500).json({ success: false });
+    }
+});
+
+app.get('/track/:token', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'track.html'));
 });
 
 // 9. TWIML FOR EMERGENCY VOICE CALL — tells Twilio what to say when the call connects

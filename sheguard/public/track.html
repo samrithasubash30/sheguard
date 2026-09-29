@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeHer - Live Location</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        html, body { height: 100%; }
+        body { display: flex; flex-direction: column; background: #121214; }
+        header { background: #3b1654; color: #fff; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
+        header h1 { font-size: 17px; }
+        header p { font-size: 12px; color: #d1b3ff; margin-top: 2px; }
+        .badge { font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 20px; background: #4CAF50; color: #fff; white-space: nowrap; }
+        .badge.ended { background: #777; }
+        .badge.stale { background: #E0932F; }
+        #map { flex: 1; }
+        .info { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; background: #fff; border-left: 5px solid #7a358c;
+                border-radius: 10px; padding: 12px 18px; box-shadow: 0 4px 25px rgba(0,0,0,.3); width: calc(100% - 30px); max-width: 420px; font-size: 13px; color: #333; }
+        .info b { display: block; font-size: 15px; margin-bottom: 4px; }
+        .info a { color: #7a358c; font-weight: 600; }
+        .msg { position: absolute; inset: 0; display: none; z-index: 2000; background: #121214; color: #fff; align-items: center; justify-content: center; text-align: center; padding: 30px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <h1 id="title">SafeHer Live Location</h1>
+            <p>Location updates every few seconds</p>
+        </div>
+        <span class="badge" id="badge">Connecting...</span>
+    </header>
+    <div id="map"></div>
+    <div class="info" id="info">
+        <b id="who">Loading...</b>
+        <span id="updated">Waiting for location...</span><br>
+        <a id="gmaps" href="#" target="_blank" rel="noopener">Open in Google Maps ↗</a>
+    </div>
+    <div class="msg" id="msg"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const token = location.pathname.split('/').filter(Boolean).pop();
+        let map, marker, circle, first = true, timer;
+
+        function showMsg(text) {
+            const m = document.getElementById('msg');
+            m.textContent = text;
+            m.style.display = 'flex';
+        }
+
+        function ago(iso) {
+            const s = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 1000));
+            if (s < 10) return 'just now';
+            if (s < 60) return s + ' seconds ago';
+            if (s < 3600) return Math.floor(s / 60) + ' min ago';
+            return Math.floor(s / 3600) + ' h ago';
+        }
+
+        async function refresh() {
+            try {
+                const res = await fetch('/api/track/' + encodeURIComponent(token), { cache: 'no-store' });
+                if (res.status === 404) { clearInterval(timer); return showMsg('This tracking link is not valid.'); }
+                const d = await res.json();
+                if (!d.success) return;
+
+                const badge = document.getElementById('badge');
+                document.getElementById('who').textContent = d.name;
+                document.getElementById('title').textContent = d.name + ' - Live Location';
+
+                if (d.lat != null && d.lon != null) {
+                    const ll = [d.lat, d.lon];
+                    if (!map) {
+                        map = L.map('map').setView(ll, 16);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }).addTo(map);
+                        marker = L.marker(ll).addTo(map);
+                        circle = L.circle(ll, { color: '#7a358c', fillColor: '#bfa3d4', fillOpacity: .3, radius: d.accuracy || 50 }).addTo(map);
+                    } else {
+                        marker.setLatLng(ll);
+                        circle.setLatLng(ll).setRadius(d.accuracy || 50);
+                        if (d.active) map.panTo(ll);
+                    }
+                    document.getElementById('gmaps').href = 'https://www.google.com/maps?q=' + d.lat + ',' + d.lon;
+                }
+
+                const stale = d.active && (Date.now() - new Date(d.updatedAt).getTime() > 60000);
+                if (!d.active) {
+                    badge.textContent = d.ended ? 'Sharing ended' : 'Link expired';
+                    badge.className = 'badge ended';
+                    document.getElementById('updated').textContent = 'Last known location, ' + ago(d.updatedAt) + '. Sharing has stopped.';
+                    clearInterval(timer);
+                } else if (stale) {
+                    badge.textContent = 'Signal delayed';
+                    badge.className = 'badge stale';
+                    document.getElementById('updated').textContent = 'Last update ' + ago(d.updatedAt) + ' (she may have lost signal)';
+                } else {
+                    badge.textContent = 'LIVE';
+                    badge.className = 'badge';
+                    document.getElementById('updated').textContent = 'Updated ' + ago(d.updatedAt);
+                }
+            } catch (e) {
+                document.getElementById('updated').textContent = 'Connection problem, retrying...';
+            }
+        }
+
+        refresh();
+        timer = setInterval(refresh, 5000);
+    </script>
+</body>
+</html>
