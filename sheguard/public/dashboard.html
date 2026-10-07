@@ -5,75 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SHEGUARD - Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root{
-            --ink:#161B2E;
-            --ink-soft:#232941;
-            --ink-line:#2E3552;
-            --paper:#FAF6EE;
-            --paper-dim:#F1EBDD;
-            --ember:#E0932F;
-            --ember-deep:#B5701E;
-            --berry:#B23A5B;
-            --moss:#4B7368;
-            --mist:#8B90A8;
-            --line:#E4DCC9;
-            --ink-text:#2B2E3D;
+            --ink:#0B0F17;
+            --panel:#131A26;
+            --panel-2:#171F2D;
+            --panel-3:#10151F;
+            --line:#242E41;
+            --line-soft:#1B2435;
+            --paper:#E9ECF2;
+            --mist:#8A93AA;
+            --mist-dim:#5B6478;
+            --signal:#FFB23D;
+            --signal-dim:rgba(255,178,61,0.14);
+            --alert:#FF4F70;
+            --alert-dim:rgba(255,79,112,0.16);
+            --safe:#30D1A4;
         }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Work Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
             display: flex;
-            background-color: var(--paper);
+            background-color: var(--ink);
             height: 100vh;
             overflow: hidden;
         }
 
-        h1, h2, h3, h4, .brand-name, .emergency-header h2 {
-            font-family: 'Fraunces', serif;
+        .mono, #telemetry-coordinates-box, #terminal-stream-box, .beacon-label {
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
         }
 
-        /* --- SIDEBAR STYLING --- */
+        .display-face, .brand-name, .sos-button, .emergency-header h2, h2#threat-modal-title, #dynamic-alert-headline {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* --- SIDEBAR --- */
         .sidebar {
-            width: 250px;
-            background-color: var(--ink);
+            width: 244px;
+            background-color: var(--panel-3);
             display: flex;
             flex-direction: column;
-            padding: 30px 0 15px 0;
+            padding: 26px 0 15px 0;
             color: var(--mist);
-            border-right: 1px solid var(--ink-line);
+            border-right: 1px solid var(--line-soft);
             justify-content: space-between;
         }
 
         .brand-container {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            margin-bottom: 25px;
-            padding: 0 20px;
+            gap: 11px;
+            margin-bottom: 30px;
+            padding: 0 22px;
         }
 
         .brand-logo-placeholder {
-            width: 56px;
-            height: 56px;
+            width: 38px;
+            height: 38px;
             background-color: transparent;
-            margin-bottom: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
+            flex-shrink: 0;
         }
+        .brand-logo-placeholder img { width: 100%; height: 100%; object-fit: contain; }
 
         .brand-name {
             color: var(--paper);
-            font-size: 17px;
-            font-weight: 600;
+            font-size: 18px;
+            font-weight: 700;
             letter-spacing: 0.2px;
         }
 
@@ -85,119 +91,120 @@
         .menu-item a {
             display: flex;
             align-items: center;
-            padding: 12px 25px;
+            padding: 11px 22px;
             color: var(--mist);
             text-decoration: none;
             font-size: 13.5px;
             font-weight: 500;
-            transition: all 0.2s ease;
-            gap: 13px;
+            transition: color .15s ease, background-color .15s ease;
+            gap: 12px;
+            border-left: 2px solid transparent;
         }
 
-        .menu-item a svg { width: 17px; height: 17px; flex-shrink: 0; opacity: .85; }
+        .menu-item a svg { width: 16px; height: 16px; flex-shrink: 0; opacity: .8; }
 
         .menu-item.active a {
-            color: #ffffff;
-            background-color: var(--ink-soft);
-            border-left: 3px solid var(--ember);
+            color: var(--paper);
+            background-color: var(--panel);
+            border-left: 2px solid var(--signal);
         }
+        .menu-item.active a svg { opacity: 1; color: var(--signal); }
 
         .menu-item a:hover {
-            color: #ffffff;
-            background-color: var(--ink-soft);
+            color: var(--paper);
+            background-color: var(--panel);
         }
 
-        .menu-icon-placeholder {
-            width: 20px;
-            height: 20px;
-            display: inline-block;
-        }
-
-        /* Presenter Controls Sidebar Box */
+        /* Simulation deck */
         .presenter-deck {
             margin-top: auto;
-            border-top: 1px solid var(--ink-line);
-            padding: 15px 20px 0 20px;
+            border-top: 1px solid var(--line-soft);
+            padding: 16px 20px 0 20px;
         }
         .presenter-title {
             font-size: 10.5px;
-            letter-spacing: 0.6px;
-            color: #5F6480;
+            letter-spacing: 0.3px;
+            color: var(--mist-dim);
             margin-bottom: 10px;
             font-weight: 600;
         }
         .sim-btn {
             width: 100%;
-            background: var(--ink-soft);
-            border: 1px solid var(--ink-line);
+            background: var(--panel);
+            border: 1px solid var(--line);
             padding: 10px 12px;
-            border-radius: 8px;
+            border-radius: 6px;
             text-align: left;
-            color: #fff;
+            color: var(--paper);
             cursor: pointer;
             margin-bottom: 8px;
             font-size: 11px;
-            transition: 0.2s;
+            transition: border-color .15s ease;
         }
-        .sim-btn:hover {
-            background: #2c3350;
-            border-color: var(--ember);
-        }
+        .sim-btn:hover { border-color: var(--signal); }
         .sim-btn strong {
             display: block;
-            color: var(--ember);
+            color: var(--signal);
             font-size: 12px;
             margin-bottom: 2px;
             font-weight: 600;
+            font-family: 'Space Grotesk', sans-serif;
         }
+        .sim-btn span { color: var(--mist); }
 
-        /* --- MAIN CONTENT WINDOW --- */
+        /* --- MAIN WINDOW --- */
         .main-window {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background-color: var(--paper);
+            background-color: var(--ink);
             position: relative;
         }
 
         .top-accent-bar {
-            height: 36px;
-            background-color: var(--ink);
+            height: 40px;
+            background-color: var(--panel-3);
+            border-bottom: 1px solid var(--line-soft);
             width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
+            padding: 0 22px;
+            flex-shrink: 0;
         }
 
         .system-status-pouch {
             font-size: 12px;
-            color: #ffffff;
+            color: var(--mist);
             font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 7px;
+            gap: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: .2px;
         }
 
         .status-dot-pulse {
             width: 7px;
             height: 7px;
-            background-color: var(--moss);
+            background-color: var(--signal);
             border-radius: 50%;
-            box-shadow: 0 0 0 3px rgba(75,115,104,0.25);
+            box-shadow: 0 0 0 3px var(--signal-dim);
         }
 
         .status-dot-pulse.alerted {
-            background-color: var(--berry);
-            box-shadow: 0 0 0 3px rgba(178,58,91,0.28);
+            background-color: var(--alert);
+            box-shadow: 0 0 0 3px var(--alert-dim);
+            animation: dotBlink 1s ease-in-out infinite;
         }
+        @keyframes dotBlink { 50% { opacity: .35; } }
 
         .profile-pic-placeholder {
-            width: 26px;
-            height: 26px;
+            width: 25px;
+            height: 25px;
             border-radius: 50%;
-            background-color: var(--ink-soft);
-            border: 1px solid rgba(255,255,255,0.2);
+            background-color: var(--panel);
+            border: 1px solid var(--line);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -214,459 +221,365 @@
 
         .user-greeting {
             font-size: 12px;
-            color: #ffffff;
+            color: var(--paper);
             font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 9px;
         }
 
-        /* Dashboard Workspace */
+        /* Dashboard body */
         .dashboard-body {
             flex: 1;
-            padding: 30px 40px 15px 40px;
+            padding: 26px 36px 15px 36px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
             overflow-y: auto;
+            gap: 18px;
         }
 
         .emergency-header {
             text-align: center;
-            margin-bottom: 10px;
         }
 
         .emergency-header h2 {
-            color: var(--ink);
-            font-size: 30px;
-            font-weight: 500;
+            color: var(--paper);
+            font-size: 27px;
+            font-weight: 600;
             margin-bottom: 5px;
             letter-spacing: -0.2px;
         }
 
         .emergency-header p {
-            color: #6B6F85;
-            font-size: 13.5px;
+            color: var(--mist);
+            font-size: 13px;
         }
 
-        /* Massive SOS Button Layout — the one deliberate hero moment */
+        /* --- SOS RADAR BEACON --- */
         .sos-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 15px 0;
+            padding: 6px 0;
+            position: relative;
         }
 
-        .sos-ripple-outer {
-            width: 190px;
-            height: 190px;
-            background: radial-gradient(circle, rgba(178,58,91,0.10) 0%, rgba(178,58,91,0.03) 70%, transparent 100%);
+        .radar-ring-outer {
+            width: 196px;
+            height: 196px;
             border-radius: 50%;
+            border: 1px solid var(--line);
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: breathe 3.2s ease-in-out infinite;
+            position: relative;
         }
 
-        .sos-ripple-middle {
-            width: 158px;
-            height: 158px;
-            background-color: rgba(178,58,91,0.09);
+        .radar-sweep {
+            position: absolute;
+            inset: 0;
             border-radius: 50%;
+            background: conic-gradient(from 0deg, transparent 0deg, transparent 300deg, var(--signal-dim) 340deg, transparent 360deg);
+            animation: radarSpin 4s linear infinite;
+        }
+        @media (prefers-reduced-motion: reduce) { .radar-sweep { animation: none; } }
+
+        @keyframes radarSpin { to { transform: rotate(360deg); } }
+
+        .radar-ring-mid {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 1px solid var(--line-soft);
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        @keyframes breathe {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.045); }
         }
 
         .sos-button {
-            width: 130px;
-            height: 130px;
-            background: linear-gradient(155deg, var(--berry) 0%, #8F2C48 100%);
+            width: 110px;
+            height: 110px;
+            background: var(--panel-2);
+            border: 2px solid var(--alert);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ffffff;
-            font-family: 'Fraunces', serif;
-            font-size: 24px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            box-shadow: 0 8px 24px rgba(178,58,91,0.38), inset 0 1px 0 rgba(255,255,255,0.15);
+            color: var(--alert);
+            font-size: 21px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
             cursor: pointer;
             user-select: none;
-            transition: 0.2s;
+            transition: .15s;
+            box-shadow: 0 0 0 0 var(--alert-dim);
+            z-index: 2;
         }
-        .sos-button:active {
-            transform: scale(0.96);
-        }
+        .sos-button:hover { background: var(--alert); color: var(--ink); box-shadow: 0 0 36px var(--alert-dim); }
+        .sos-button:active { transform: scale(0.96); }
 
-        /* Grid Cards Section — deliberately not-identical treatment */
-        .cards-grid {
+        /* --- INSTRUMENT ROW (Audio + GPS) --- */
+        .instrument-row {
             display: grid;
-            grid-template-columns: 1.1fr 1.1fr 1.4fr 1.4fr;
-            gap: 15px;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
             width: 100%;
-            max-width: 1100px;
-            margin-top: auto;
-            margin-bottom: 15px;
+            max-width: 1080px;
         }
 
-        .card {
-            background-color: #ffffff;
-            border-radius: 10px;
-            padding: 15px 20px;
-            box-shadow: 0 2px 10px rgba(22,27,46,0.05);
+        .instrument {
+            background: var(--panel);
             border: 1px solid var(--line);
-            height: 185px;
-            overflow: hidden;
-        }
-
-        .action-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
+            border-left: 3px solid var(--signal);
+            border-radius: 6px;
+            padding: 16px 18px;
             cursor: pointer;
-            transition: border 0.2s, transform 0.2s;
+            transition: border-color .15s ease;
         }
-        .action-card:hover {
-            border-color: var(--ember);
-            transform: translateY(-2px);
-        }
+        .instrument:hover { border-color: var(--signal); }
 
-        .action-icon-placeholder {
-            width: 44px;
-            height: 44px;
-            background-color: var(--paper-dim);
-            border-radius: 50%;
+        .instrument-label {
+            font-size: 11px;
+            color: var(--mist);
+            font-weight: 600;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            color: var(--ember-deep);
+            gap: 7px;
         }
-        .action-icon-placeholder svg { width: 22px; height: 22px; }
+        .instrument-label svg { width: 14px; height: 14px; color: var(--signal); flex-shrink: 0; }
 
-        .action-card h3 {
-            color: var(--ink-text);
-            font-size: 16px;
+        .instrument-value {
+            font-size: 17px;
+            color: var(--paper);
             font-weight: 600;
-            margin-bottom: 4px;
         }
-        .action-card p {
-            font-size: 12px;
-            color: #6B6F85;
-            word-break: break-all;
-            padding: 0 5px;
+        #telemetry-coordinates-box { font-size: 16px; letter-spacing: .2px; }
+
+        .instrument-sub { font-size: 11px; color: var(--mist-dim); margin-top: 4px; }
+
+        /* --- SAFE CIRCLE + LOG --- */
+        .lower-row {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 14px;
+            width: 100%;
+            max-width: 1080px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .panel-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
         }
 
         .panel-card h4 {
-            color: var(--ink-text);
-            font-size: 13.5px;
+            color: var(--paper);
+            font-size: 13px;
             font-weight: 600;
             margin-bottom: 10px;
-            border-bottom: 1px solid var(--paper-dim);
-            padding-bottom: 8px;
-            font-family: 'Fraunces', serif;
+            padding-bottom: 9px;
+            border-bottom: 1px solid var(--line-soft);
+            font-family: 'Space Grotesk', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-
-        /* Logs card: quiet terminal treatment for intentional variation */
-        .panel-card.log-card {
-            background: var(--ink);
-            border-color: var(--ink-line);
-        }
-        .panel-card.log-card h4 {
-            color: var(--paper);
-            border-bottom-color: var(--ink-line);
-        }
+        .panel-card h4 span { font-size: 10.5px; color: var(--mist-dim); font-weight: 500; font-family: 'Inter', sans-serif; }
 
         .list-container-scroll {
-            height: 130px;
+            flex: 1;
             overflow-y: auto;
+            min-height: 90px;
         }
 
         .list-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 7px 0;
-            border-bottom: 1px solid var(--paper-dim);
+            padding: 8px 0;
+            border-bottom: 1px solid var(--line-soft);
         }
+        .list-item:last-child { border-bottom: none; }
 
-        .list-item:last-child {
-            border-bottom: none;
-        }
+        .item-left-profile { display: flex; align-items: center; gap: 11px; }
 
-        .item-left-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .avatar-placeholder {
-            width: 30px;
-            height: 30px;
+        .priority-badge {
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
-            background-color: var(--paper-dim);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            color: var(--ember-deep);
-            font-weight: 600;
-        }
-
-        .item-info h5 {
-            color: var(--ink-text);
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-        .item-info p {
-            color: #9A9DAD;
-            font-size: 10px;
-        }
-
-        .action-shortcut-icons {
-            display: flex;
-            gap: 6px;
-        }
-
-        .mini-icon-btn-placeholder {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background-color: var(--paper-dim);
+            background: var(--signal-dim);
+            border: 1px solid var(--signal);
+            color: var(--signal);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 11px;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+            flex-shrink: 0;
         }
 
-        .timestamp {
-            color: #9A9DAD;
-            font-size: 10px;
-            white-space: nowrap;
+        .item-info h5 { color: var(--paper); font-size: 13px; font-weight: 500; }
+        .item-info p { color: var(--mist-dim); font-size: 10.5px; font-family: 'JetBrains Mono', monospace; }
+
+        .action-shortcut-icons { display: flex; gap: 6px; }
+        .mini-icon-btn-placeholder {
+            width: 23px; height: 23px; border-radius: 50%;
+            background-color: var(--line-soft);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px;
         }
 
-        /* --- BOTTOM CONTROL NAV BAR --- */
-        .bottom-nav {
-            height: 52px;
-            background-color: var(--ink);
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            width: calc(100% - 40px);
-            margin: 0 auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 40px;
+        /* Log strip: terminal */
+        .log-card {
+            background: var(--panel-3);
+            border-color: var(--line-soft);
+        }
+        #terminal-stream-box {
+            font-size: 11px;
+            color: var(--safe);
+            line-height: 1.6;
+            padding-right: 4px;
         }
 
-        .bottom-nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: var(--mist);
-            text-decoration: none;
-            font-size: 10px;
-            gap: 3px;
-        }
-
-        .bottom-nav-item.active {
-            color: var(--ember);
-        }
-
-        .bottom-icon-placeholder {
-            width: 18px;
-            height: 18px;
-            margin-bottom: 2px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
-        .bottom-icon-placeholder svg { width: 16px; height: 16px; }
-
-        /* --- MODAL POP-UPS --- */
+        /* --- MODALS --- */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(22,27,46,0.72);
+            inset: 0;
+            background: rgba(6,9,15,0.78);
             z-index: 2000;
             justify-content: center;
             align-items: center;
         }
         .modal-content {
-            background: var(--paper);
-            border-radius: 14px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 10px;
             width: 100%;
-            max-width: 480px;
+            max-width: 460px;
             padding: 30px;
-            border-top: 5px solid var(--ember);
+            border-top: 3px solid var(--signal);
             text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+            box-shadow: 0 30px 70px rgba(0,0,0,0.5);
         }
+        #alert-border-style { border-top-color: var(--alert); }
+        .modal-content h2 { color: var(--paper); font-size: 21px; font-weight: 600; }
+        .modal-content > p { color: var(--mist); font-size: 13.5px; margin: 10px 0 4px; }
+        #countdown-ticker { color: var(--signal); font-size: 40px; font-weight: 700; margin: 10px 0; font-family: 'Space Grotesk', sans-serif; }
+
         .popup-msg-box {
-            background: #ffffff;
-            border-left: 3px solid var(--ember);
+            background: var(--panel-2);
+            border: 1px solid var(--line);
+            border-left: 3px solid var(--signal);
             border-radius: 6px;
-            padding: 12px;
+            padding: 12px 14px;
             text-align: left;
-            font-size: 13px;
+            font-size: 12.5px;
             margin-top: 12px;
-            color: var(--ink-text);
+            color: var(--paper);
             line-height: 1.5;
         }
+        .popup-msg-box strong { font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; }
+
         .btn-close-modal {
-            background: var(--ink);
-            color: var(--paper);
+            background: var(--signal);
+            color: var(--ink);
             padding: 11px 26px;
             border: none;
-            border-radius: 24px;
+            border-radius: 6px;
             cursor: pointer;
             margin-top: 20px;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 13px;
+            font-family: 'Space Grotesk', sans-serif;
         }
-        .btn-close-modal:hover {
-            background: var(--ink-soft);
-        }
+        .btn-close-modal:hover { filter: brightness(1.08); }
 
-        /* --- SAFE CIRCLE NOTICE TOAST --- */
+        /* Toast + side panel */
         .safe-circle-toast {
             display: none;
             position: fixed;
-            top: 24px;
-            left: 50%;
+            top: 20px; left: 50%;
             transform: translateX(-50%);
             z-index: 2100;
-            background: var(--ink);
-            color: #ffffff;
-            padding: 14px 22px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            border-left: 4px solid var(--ember);
+            background: var(--panel);
+            border: 1px solid var(--line);
+            color: var(--paper);
+            padding: 13px 20px;
+            border-radius: 8px;
+            box-shadow: 0 16px 36px rgba(0,0,0,0.4);
+            border-left: 3px solid var(--signal);
             max-width: 420px;
             width: calc(100% - 40px);
             text-align: left;
             font-size: 12.5px;
             line-height: 1.5;
         }
-        .safe-circle-toast strong {
-            color: var(--ember);
-            display: block;
-            margin-bottom: 4px;
-            font-size: 13.5px;
-            font-weight: 600;
-        }
+        .safe-circle-toast strong { color: var(--signal); display: block; margin-bottom: 4px; font-size: 13px; font-family: 'Space Grotesk', sans-serif; }
 
-        /* --- NOTIFIED SIDE PANEL --- */
         .notified-side-panel {
             display: none;
             position: fixed;
-            top: 50%;
-            right: 40px;
+            top: 50%; right: 36px;
             transform: translateY(-50%);
             z-index: 2100;
-            background: var(--ink);
-            color: #ffffff;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            color: var(--paper);
             padding: 16px 20px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            border-left: 4px solid var(--moss);
+            border-radius: 8px;
+            box-shadow: 0 16px 36px rgba(0,0,0,0.4);
+            border-left: 3px solid var(--safe);
             width: 220px;
-            text-align: left;
             font-size: 13px;
         }
-        .notified-side-panel strong {
-            color: var(--moss);
-            display: block;
-            margin-bottom: 10px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        .notified-side-panel .notified-name {
-            padding: 6px 0;
-            border-bottom: 1px solid var(--ink-line);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .notified-side-panel .notified-name:last-child {
-            border-bottom: none;
+        .notified-side-panel strong { color: var(--safe); display: block; margin-bottom: 10px; font-size: 13.5px; font-family: 'Space Grotesk', sans-serif; }
+        .notified-side-panel .notified-name { padding: 6px 0; border-bottom: 1px solid var(--line-soft); display: flex; align-items: center; gap: 8px; }
+        .notified-side-panel .notified-name:last-child { border-bottom: none; }
+
+        /* --- BOTTOM NAV (mobile) --- */
+        .bottom-nav {
+            display: none;
         }
 
-        /* ═══════════════════════════════════════
-           MOBILE RESPONSIVE — Full Fix
-        ═══════════════════════════════════════ */
         @media (max-width: 768px) {
-            body {
-                flex-direction: column;
-                height: 100dvh;
-                overflow: hidden;
-            }
+            body { flex-direction: column; height: 100dvh; overflow: hidden; }
             .sidebar { display: none; }
-            .top-accent-bar { height: 45px; padding: 0 15px; }
-            .system-status-pouch { font-size: 11px; }
             .main-window { width: 100%; height: 100dvh; flex: 1; }
-            .dashboard-body {
-                padding: 15px 15px 10px 15px;
-                overflow-y: auto;
-                justify-content: flex-start;
-                gap: 12px;
-            }
-            .emergency-header h2 { font-size: 21px; margin-bottom: 4px; }
-            .emergency-header p { font-size: 12px; }
-            .sos-ripple-outer { width: 160px; height: 160px; }
-            .sos-ripple-middle { width: 130px; height: 130px; }
-            .sos-button { width: 105px; height: 105px; font-size: 20px; }
-            .sos-container { margin: 8px 0; }
-            .cards-grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-            .card { height: 150px; padding: 12px; }
-            .action-card h3 { font-size: 13px; }
-            .action-icon-placeholder { font-size: 24px; margin-bottom: 6px; width: 36px; height: 36px; }
-            .action-card p { font-size: 10px; }
-            .panel-card h4 { font-size: 12px; }
-            .list-container-scroll { height: 100px; }
-            .item-info h5 { font-size: 11px; }
-            .item-info p { font-size: 9px; }
+            .dashboard-body { padding: 16px 16px 72px 16px; gap: 14px; }
+            .emergency-header h2 { font-size: 20px; }
+            .radar-ring-outer { width: 164px; height: 164px; }
+            .radar-ring-mid { width: 126px; height: 126px; }
+            .sos-button { width: 92px; height: 92px; font-size: 17px; }
+            .instrument-row { grid-template-columns: 1fr 1fr; }
+            .lower-row { grid-template-columns: 1fr; }
             .bottom-nav {
-                width: 100%; border-radius: 0; height: 56px; gap: 0;
-                justify-content: space-around; margin: 0;
-                position: fixed; bottom: 0; left: 0; z-index: 100;
+                display: flex;
+                position: fixed; bottom: 0; left: 0;
+                height: 58px; width: 100%;
+                background: var(--panel-3);
+                border-top: 1px solid var(--line-soft);
+                justify-content: space-around;
+                align-items: center;
+                z-index: 100;
             }
-            .bottom-nav-item { font-size: 9px; flex: 1; padding: 4px 0; }
-            .bottom-icon-placeholder { font-size: 18px; margin-bottom: 2px; }
-            .modal-content { margin: 15px; padding: 20px; max-width: calc(100vw - 30px); }
-            .popup-msg-box { font-size: 11px; word-break: break-all; }
-            .safe-circle-toast { top: 12px; padding: 12px 16px; font-size: 11.5px; }
-            .notified-side-panel {
-                top: auto; bottom: 16px; right: 50%; transform: translateX(50%);
-                width: calc(100% - 60px); max-width: 320px;
-            }
+            .bottom-nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--mist); text-decoration: none; font-size: 10px; }
+            .bottom-nav-item.active { color: var(--signal); }
+            .bottom-nav-item svg { width: 18px; height: 18px; }
+            .notified-side-panel { top: auto; bottom: 70px; right: 50%; transform: translateX(50%); width: calc(100% - 60px); max-width: 320px; }
         }
 
-        @media (max-width: 380px) {
-            .cards-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-            .card { height: 130px; padding: 10px; }
-            .sos-ripple-outer { width: 140px; height: 140px; }
-            .sos-ripple-middle { width: 114px; height: 114px; }
-            .sos-button { width: 90px; height: 90px; font-size: 18px; }
-            .emergency-header h2 { font-size: 18px; }
+        @media (max-width: 420px) {
+            .instrument-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -675,50 +588,52 @@
     <audio id="emergency-siren" src="siren.mp3" loop preload="auto"></audio>
 
     <div id="init-interaction-modal" class="modal" style="display: flex;">
-        <div class="modal-content" style="border-top-color: #161B2E;">
-            <h2 style="color:#161B2E; font-size: 22px; margin-bottom: 10px;">Security Verification Required</h2>
-            <p style="color:#555; font-size: 14px; margin-bottom: 15px;">Initialize the SheGuard client environment hooks, speech algorithms, and device audio pipelines now.</p>
-            <button class="btn-close-modal" style="background: #161B2E; width: 100%; margin-top: 5px; padding: 14px;" onclick="bootDashboardPipeline()">Initialize Monitoring System</button>
+        <div class="modal-content">
+            <h2>Turn on monitoring</h2>
+            <p>SheGuard needs microphone and location access to watch for distress keywords and track your position. Nothing is shared until you ask for help.</p>
+            <button class="btn-close-modal" style="width: 100%; margin-top: 10px; padding: 14px;" onclick="bootDashboardPipeline()">Start monitoring</button>
         </div>
     </div>
 
     <aside class="sidebar">
-        <div class="brand-container">
-            <div class="brand-logo-placeholder"><img src="main.png" alt="SafeHer" style="width:60px; height:60px; object-fit:contain;"></div>
-            <div class="brand-name">SafeHer</div>
+        <div>
+            <div class="brand-container">
+                <div class="brand-logo-placeholder"><img src="main.png" alt="SafeHer"></div>
+                <div class="brand-name">SafeHer</div>
+            </div>
+            <ul class="menu-list">
+                <li class="menu-item active">
+                    <a href="#">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path></svg> Home
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="contact-details.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Contacts
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="profile-details.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Profile
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" onclick="handleLogout()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg> Log Out
+                    </a>
+                </li>
+            </ul>
         </div>
-        <ul class="menu-list">
-            <li class="menu-item active">
-                <a href="#">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path></svg> Home
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="contact-details.html">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Contacts
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="profile-details.html">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Profile
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="#" onclick="handleLogout()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg> Log Out
-                </a>
-            </li>
-        </ul>
 
         <div class="presenter-deck">
-            <div class="presenter-title">Simulation Deck</div>
+            <div class="presenter-title">Simulation deck</div>
             <button class="sim-btn" onclick="triggerVoiceSimulation()">
-                <strong>🗣️ Mock Vocal Keyword Input</strong>
-                <span>Simulate speaking word "Help!"</span>
+                <strong>Mock voice trigger</strong>
+                <span>Simulate saying "Help!"</span>
             </button>
             <button class="sim-btn" onclick="simulateStasisEvent()">
-                <strong>📍 Force 30s Stasis Alert</strong>
-                <span>Force zero-movement stasis alarm</span>
+                <strong>Force stasis alert</strong>
+                <span>Simulate 30s of no movement</span>
             </button>
         </div>
     </aside>
@@ -737,93 +652,97 @@
 
         <div class="dashboard-body">
             <div class="emergency-header">
-                <h2>Are you in emergency ?</h2>
-                <p>Press the SOS button below and help will reach you shortly.</p>
+                <h2>Are you in an emergency?</h2>
+                <p>Hold off for a false alarm, or press SOS and your Safe Circle is notified immediately.</p>
             </div>
 
             <div class="sos-container">
-                <div class="sos-ripple-outer">
-                    <div class="sos-ripple-middle">
+                <div class="radar-ring-outer">
+                    <div class="radar-sweep"></div>
+                    <div class="radar-ring-mid">
                         <div class="sos-button" onclick="fireEmergencyProtocol('Manual Screen SOS Interface Intervention')">SOS</div>
                     </div>
                 </div>
             </div>
 
-            <div class="cards-grid">
-                
-                <div class="card action-card" onclick="startContinuousSpeechRecognition()">
-                    <div class="action-icon-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg></div>
-                    <h3>Audio Core State</h3>
-                    <p id="audio-state-text" style="color:#888; font-weight:500;">Awaiting alignment...</p>
+            <div class="instrument-row">
+                <div class="instrument" onclick="startContinuousSpeechRecognition()">
+                    <div class="instrument-label">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>
+                        Voice listener
+                    </div>
+                    <div class="instrument-value" id="audio-state-text">Awaiting alignment...</div>
+                    <div class="instrument-sub">Listens for "help" or "stop"</div>
                 </div>
 
-                <div class="card action-card" onclick="window.location.href='live-map.html'">
-                    <div class="action-icon-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
-                    <h3>Live Coordinates</h3>
-                    <p id="telemetry-coordinates-box" style="font-weight: 600; color: #161B2E;">Locating...</p>
-                    <p style="font-size: 10px; color: #999; margin-top: 4px;">Click to track on roads map</p>
+                <div class="instrument" onclick="window.location.href='live-map.html'">
+                    <div class="instrument-label">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        Live coordinates
+                    </div>
+                    <div class="instrument-value" id="telemetry-coordinates-box">Locating...</div>
+                    <div class="instrument-sub">Tap to open the roads map</div>
                 </div>
+            </div>
 
-                <div class="card panel-card">
-                    <h4>Safe Circle</h4>
+            <div class="lower-row">
+                <div class="panel-card">
+                    <h4>Safe Circle <span id="safe-circle-count"></span></h4>
                     <div class="list-container-scroll" id="safe-circle-list">
-                        <div style="color:#aaa; font-size:12px; text-align:center; margin-top:40px;">Loading contacts...</div>
+                        <div style="color:var(--mist-dim); font-size:12px; text-align:center; margin-top:40px;">Loading contacts...</div>
                     </div>
                 </div>
 
-                <div class="card panel-card log-card">
-                    <h4>Execution Stream Logs</h4>
-                    <div class="list-container-scroll" id="terminal-stream-box" style="font-family:'Courier New',monospace; font-size:11px; color:#C7CBE0; line-height:1.5; padding-right: 5px;">
-                        [SYSTEM] Frame offline. Click initialization prompt banner...
+                <div class="panel-card log-card">
+                    <h4>Execution stream <span>live</span></h4>
+                    <div class="list-container-scroll" id="terminal-stream-box">
+                        [SYSTEM] Frame offline. Click the start-monitoring prompt...
                     </div>
                 </div>
-
             </div>
 
             <nav class="bottom-nav">
-                <a href="index.html" class="bottom-nav-item active"><div class="bottom-icon-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path></svg></div>Home</a>
-                <a href="live-map.html" class="bottom-nav-item"><div class="bottom-icon-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>Location Map</a>
+                <a href="index.html" class="bottom-nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path></svg>Home</a>
+                <a href="live-map.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>Map</a>
             </nav>
         </div>
     </main>
 
-    <!-- NEW: Safe Circle notice toast — shown alongside the grace-period modal -->
     <div id="safe-circle-notice-toast" class="safe-circle-toast">
-        <strong>🔔 Notifying Your Safe Circle</strong>
+        <strong>Notifying your Safe Circle</strong>
         <span id="safe-circle-notice-text">Your trusted contacts will be alerted automatically when the timer reaches 0. Tap Stop to cancel.</span>
     </div>
 
     <div id="stasis-warning-modal" class="modal">
-        <div class="modal-content" style="border-top-color: #E0932F;">
-            <h2 id="threat-modal-title" style="color:#161B2E; font-size:22px;">⚠️ Are You Okay?</h2>
-            <p id="threat-modal-desc" style="margin:12px 0; color:#555; font-size:14px;">An alert will be sent to your Safe Circle in a few seconds unless you cancel.</p>
-            <div id="countdown-ticker" style="font-size:38px; font-weight:bold; color:#161B2E; margin:10px 0;">10</div>
-            <button class="btn-close-modal" style="background:#B23A5B;" onclick="dismissEmergencySystem()">I'm Okay, Cancel</button>
+        <div class="modal-content">
+            <h2 id="threat-modal-title">Are you okay?</h2>
+            <p id="threat-modal-desc">An alert will be sent to your Safe Circle in a few seconds unless you cancel.</p>
+            <div id="countdown-ticker">10</div>
+            <button class="btn-close-modal" style="background:var(--alert); color:#fff;" onclick="dismissEmergencySystem()">I'm okay, cancel</button>
         </div>
     </div>
 
     <div id="emergency-alert-modal" class="modal">
-        <div class="modal-content" id="alert-border-style" style="border-top-color:#B23A5B;">
-            <h2 id="dynamic-alert-headline" style="font-size:24px; color:#161B2E;">🚨 Alert Sent</h2>
-            <p id="alert-reason-box" style="color:#777; font-size:13px; margin-top:4px; margin-bottom: 10px;"></p>
-            
+        <div class="modal-content" id="alert-border-style">
+            <h2 id="dynamic-alert-headline">Alert sent</h2>
+            <p id="alert-reason-box" style="color: var(--mist); font-size:13px; margin-top:4px; margin-bottom: 10px;"></p>
+
             <div class="popup-msg-box">
-                <strong style="color:#161B2E;">📩 Message sent</strong>
-                <span id="dynamic-sms-payload-text" style="color: #2B2E3D; display:block; margin-top:5px; font-weight:500;">Sending...</span>
+                <strong>Message sent</strong>
+                <span id="dynamic-sms-payload-text" style="color: var(--paper); display:block; margin-top:5px; font-weight:500;">Sending...</span>
             </div>
 
-            <div class="popup-msg-box" style="border-left-color: #4B7368;">
-                <strong style="color:#4B7368;">📞 Calling now</strong><br>
+            <div class="popup-msg-box" style="border-left-color: var(--safe);">
+                <strong style="color: var(--safe);">Calling now</strong><br>
                 <span id="dynamic-call-payload-text">Trying to reach your Safe Circle by phone...</span>
             </div>
 
-            <button class="btn-close-modal" style="background:#4B7368;" onclick="dismissEmergencySystem()">I'm Safe Now</button>
+            <button class="btn-close-modal" style="background:var(--safe); color:var(--ink);" onclick="dismissEmergencySystem()">I'm safe now</button>
         </div>
     </div>
 
-    <!-- NEW: Notified side panel — appears alongside the alert-sent modal -->
     <div id="notified-side-panel" class="notified-side-panel">
-        <strong>✅ Notified</strong>
+        <strong>Notified</strong>
         <div id="notified-side-panel-list"></div>
     </div>
 
@@ -971,16 +890,17 @@
                 const response = await fetch(`/api/dashboard/data/${userId}`);
                 const result = await response.json();
                 const listEl = document.getElementById('safe-circle-list');
+                const countEl = document.getElementById('safe-circle-count');
 
                 if (result.success && result.contacts.length > 0) {
                     safeCircleContacts = result.contacts; // NEW: store for later use in popups
+                    countEl.innerText = result.contacts.length;
                     listEl.innerHTML = '';
-                    result.contacts.forEach(c => {
-                        const emoji = ['🧑','👩','🧔','👨','🛡️'][Math.floor(Math.random() * 5)];
+                    result.contacts.forEach((c, i) => {
                         listEl.innerHTML += `
                             <div class="list-item">
                                 <div class="item-left-profile">
-                                    <div class="avatar-placeholder">${emoji}</div>
+                                    <div class="priority-badge">${i + 1}</div>
                                     <div class="item-info">
                                         <h5>${c.name}${c.relationship ? ' (' + c.relationship + ')' : ''}</h5>
                                         <p>${c.phone}</p>
@@ -996,7 +916,7 @@
                     appendLogMessage(`[SERVER SYNC]: Loaded ${result.contacts.length} verified contacts from database.`);
                 } else {
                     safeCircleContacts = []; // NEW
-                    listEl.innerHTML = '<div style="color:#aaa; font-size:12px; text-align:center; margin-top:30px; padding:0 10px;">No contacts saved yet.<br><a href="contact-details.html" style="color:#B23A5B;">Add contacts →</a></div>';
+                    listEl.innerHTML = '<div style="color:var(--mist-dim); font-size:12px; text-align:center; margin-top:30px; padding:0 10px;">No contacts saved yet.<br><a href="contact-details.html" style="color:var(--signal);">Add contacts →</a></div>';
                     appendLogMessage('[SERVER SYNC]: No contacts found in database for this user.');
                 }
             } catch (err) {
@@ -1007,14 +927,13 @@
         // BROWSER INTERACTION BOOT LAYER
         async function bootDashboardPipeline() {
             document.getElementById('init-interaction-modal').style.display = 'none';
-            
+
             document.getElementById('status-signal-text').innerText = "AI Guard: Active & Monitoring";
             document.getElementById('audio-state-text').innerText = "Listening for vocal anchors";
-            document.getElementById('audio-state-text').style.color = "#4B7368";
-            
+
             const displayBox = document.getElementById('terminal-stream-box');
             displayBox.innerHTML = "[SYSTEM] Initial frameworks bound.<br>[SYSTEM] Interaction established. Audio stream tokens unlocked.";
-            
+
             // Load real contacts from DB inside boot sequence
             await loadSafetyCircleFromDatabase();
 
@@ -1025,11 +944,10 @@
         // CONTINUOUS LIVE SPEECH RECOGNITION (WEB SPEECH RECOGNITION HOOKS)
         function startContinuousSpeechRecognition() {
             window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            
+
             if (!window.SpeechRecognition) {
                 appendLogMessage("Acoustic Error: Speech Recognition API not supported natively on this browser context.");
                 document.getElementById('audio-state-text').innerText = "Microphone Module Error";
-                document.getElementById('audio-state-text').style.color = "#B23A5B";
                 return;
             }
 
@@ -1075,7 +993,7 @@
             const siren = document.getElementById('emergency-siren');
             siren.play().catch(e => console.log("Audio pipeline stream blocked."));
 
-            document.getElementById('threat-modal-title').innerText = `🗣️ We Heard "${matchedPhrase}"`;
+            document.getElementById('threat-modal-title').innerText = `We heard "${matchedPhrase}"`;
             document.getElementById('threat-modal-desc').innerText = `We think you might need help. An alert will be sent to your Safe Circle in a few seconds unless you cancel.`;
             document.getElementById('stasis-warning-modal').style.display = 'flex';
             showSafeCircleNotice(); // NEW: show the notice alongside the grace-period modal
@@ -1102,14 +1020,14 @@
         function requestDeviceGeolocation() {
             if (navigator.geolocation) {
                 appendLogMessage("GPS Core: Requesting coordinate permissions...");
-                
+
                 navigator.geolocation.watchPosition(position => {
                     currentPos = { lat: position.coords.latitude, lon: position.coords.longitude, accuracy: position.coords.accuracy };
                     const lat = position.coords.latitude.toFixed(4);
                     const lon = position.coords.longitude.toFixed(4);
-                    
+
                     document.getElementById('telemetry-coordinates-box').innerText = `${lat}° N, ${lon}° E`;
-                    
+
                     if (lat === lastKnownLat && lon === lastKnownLon) {
                         // Position identical
                     } else {
@@ -1139,7 +1057,7 @@
         function evaluateStasisMetrics() {
             if (isEmergencyTriggered || lastKnownLat === null) return;
             stationarySecondsCount++;
-            
+
             if (stationarySecondsCount === 10 || stationarySecondsCount === 20) {
                 appendLogMessage(`AI Track: Location stasis check parameters unchanged for ${stationarySecondsCount}s...`);
             }
@@ -1159,19 +1077,19 @@
         }
 
         function initiateStasisEscalation() {
-            appendLogMessage("🚨 CRITICAL: Location stasis tracking crossed 30s limit!");
-            
+            appendLogMessage("CRITICAL: Location stasis tracking crossed 30s limit!");
+
             const siren = document.getElementById('emergency-siren');
             siren.play().catch(e => console.log("Audio asset intercept blocked."));
 
-            document.getElementById('threat-modal-title').innerText = "⚠️ No Movement Detected";
+            document.getElementById('threat-modal-title').innerText = "No movement detected";
             document.getElementById('threat-modal-desc').innerText = "You haven't moved in over 30 seconds. An alert will be sent to your Safe Circle in a few seconds unless you cancel.";
             document.getElementById('stasis-warning-modal').style.display = 'flex';
             showSafeCircleNotice(); // NEW: show the notice alongside the grace-period modal
-            
+
             let gracePeriodSeconds = 10;
             document.getElementById('countdown-ticker').innerText = gracePeriodSeconds;
-            
+
             if (counterClock) clearInterval(counterClock);
             counterClock = setInterval(() => {
                 gracePeriodSeconds--;
@@ -1193,16 +1111,16 @@
             clearInterval(stasisEvaluationLoop);
             document.getElementById('stasis-warning-modal').style.display = 'none';
             hideSafeCircleNotice(); // NEW: make sure the notice is gone once we reach the "sent" popup
-            
+
             if (speechRecognitionEngine) {
                 try { speechRecognitionEngine.stop(); } catch(e) {}
             }
-            
+
             document.getElementById('emergency-siren').pause();
-            
+
             document.getElementById('status-signal-dot').className = "status-dot-pulse alerted";
             document.getElementById('status-signal-text').innerText = "Alert Sent";
-            
+
             const currentCoordinates = document.getElementById('telemetry-coordinates-box').innerText;
             const liveMapUrl = `https://maps.google.com/?q=${currentCoordinates.replace(/[°NE\s]/g, '').replace(',', ',')}`;
 
@@ -1212,24 +1130,21 @@
             const smsBox = document.getElementById('dynamic-sms-payload-text');
 
             if (cause.includes("Vocal") || cause.includes("Distress") || cause.includes("HELP")) {
-                alertBorder.style.borderTopColor = "#B23A5B"; 
-                headline.innerHTML = "🗣️ Voice Alert Sent";
+                headline.innerHTML = "Voice alert sent";
                 reasonBox.innerText = "We heard a distress word and sent this alert automatically.";
-                smsBox.innerHTML = `We heard you say "help" or "stop" and shared your live location: <a href="${liveMapUrl}" target="_blank">${liveMapUrl}</a>`;
-                
+                smsBox.innerHTML = `We heard you say "help" or "stop" and shared your live location: <a href="${liveMapUrl}" target="_blank" style="color: var(--signal);">${liveMapUrl}</a>`;
+
             } else if (cause.includes("Timeout") || cause.includes("Static") || cause.includes("Immobility")) {
-                alertBorder.style.borderTopColor = "#E0932F"; 
-                headline.innerHTML = "📍 Location Alert Sent";
+                headline.innerHTML = "Location alert sent";
                 reasonBox.innerText = "We noticed you haven't moved in over 30 seconds.";
-                smsBox.innerHTML = `No movement detected for 30+ seconds. Your live location: <a href="${liveMapUrl}" target="_blank">${liveMapUrl}</a>`;
-                
+                smsBox.innerHTML = `No movement detected for 30+ seconds. Your live location: <a href="${liveMapUrl}" target="_blank" style="color: var(--signal);">${liveMapUrl}</a>`;
+
             } else {
-                alertBorder.style.borderTopColor = "#161B2E"; 
-                headline.innerHTML = "🚨 SOS Alert Sent";
+                headline.innerHTML = "SOS alert sent";
                 reasonBox.innerText = "You pressed the SOS button.";
-                smsBox.innerHTML = `Your live location has been shared: <a href="${liveMapUrl}" target="_blank">${liveMapUrl}</a>`;
+                smsBox.innerHTML = `Your live location has been shared: <a href="${liveMapUrl}" target="_blank" style="color: var(--signal);">${liveMapUrl}</a>`;
             }
-            
+
             document.getElementById('emergency-alert-modal').style.display = 'flex';
             showNotifiedPanel(); // NEW: show who was notified, separately, beside the modal
             startCallEscalation(); // NEW: simulate calling contacts one at a time, in priority order
@@ -1261,7 +1176,7 @@
                     startLiveTracking(result.token);
                     const smsBox = document.getElementById('dynamic-sms-payload-text');
                     if (smsBox && result.trackUrl) {
-                        smsBox.innerHTML = `Your live location is being shared: <a href="${result.trackUrl}" target="_blank">${result.trackUrl}</a>`;
+                        smsBox.innerHTML = `Your live location is being shared: <a href="${result.trackUrl}" target="_blank" style="color: var(--signal);">${result.trackUrl}</a>`;
                     }
                 }
 
@@ -1325,28 +1240,26 @@
             hideSafeCircleNotice(); // NEW: make sure the notice is cleared on Stop too
             hideNotifiedPanel(); // NEW: hide the notified side panel too
             stopCallEscalation(); // NEW: stop the simulated call cycle
-            
+
             const siren = document.getElementById('emergency-siren');
             siren.pause();
             siren.currentTime = 0;
-            
+
             document.getElementById('status-signal-dot').className = "status-dot-pulse";
             document.getElementById('status-signal-text').innerText = "AI Guard: Active & Monitoring";
             document.getElementById('audio-state-text').innerText = "Listening for vocal anchors";
-            document.getElementById('audio-state-text').style.color = "#4B7368";
-            
+
             stationarySecondsCount = 0;
             appendLogMessage("[PIPELINE RESET]: Reset algorithms context layout back to baseline.");
-            
+
             if (stasisEvaluationLoop) clearInterval(stasisEvaluationLoop);
             stasisEvaluationLoop = setInterval(evaluateStasisMetrics, 1000);
-            
+
             startContinuousSpeechRecognition();
         }
 
         function triggerVoiceSimulation() {
             document.getElementById('audio-state-text').innerText = "Matched Command: 'HELP!'";
-            document.getElementById('audio-state-text').style.color = "#B23A5B";
             appendLogMessage("Simulation Deck: Injecting mock voice event string frame validation logic.");
             fireEmergencyProtocol("Vocal Trigger Pattern Event Match");
         }
