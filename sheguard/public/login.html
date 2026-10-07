@@ -3,258 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeHer - Authentication Portal</title>
+    <title>SafeHer - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            font-family: 'Segoe UI', sans-serif; 
+        :root{
+            --purple-900:#2D1B4E;
+            --purple-800:#3D2570;
+            --purple-700:#5B21B6;
+            --purple-600:#7C3AED;
+            --purple-500:#9333EA;
+            --violet-accent:#A855F7;
+            --lavender-50:#F7F4FE;
+            --lavender-100:#EFE9FC;
+            --lavender-200:#E1D6F8;
+            --ink:#1A1125;
+            --ink-soft:#6B6180;
+            --white:#FFFFFF;
+            --danger:#E4437A;
+            --success:#16A085;
         }
-        
-        body { 
-            background: radial-gradient(circle at center, #4A148C 0%, #121214 100%); 
-            min-height: 100vh; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            color: #fff; 
-        }
-        
-        .login-card { 
-            background: rgba(26, 26, 30, 0.95); 
-            padding: 45px 40px; 
-            border-radius: 20px; 
-            width: 100%; 
-            max-width: 420px; 
-            border: 1px solid #3A3A42; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6); 
-        }
-        
-        .logo-title { 
-            text-align: center; 
-            margin-bottom: 30px; 
-        }
-        
-        .logo-title h1 { 
-            color: #ff66b2; 
-            font-size: 28px; 
-        }
-        
-        .logo-title p { 
-            color: #888; 
-            font-size: 13px; 
-            margin-top: 5px; 
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--lavender-50); min-height: 100vh; color: var(--ink); }
 
-        .tab-switcher {
-            display: flex;
-            background: #222226;
-            border-radius: 8px;
-            margin-bottom: 28px;
-            padding: 4px;
-        }
-        .tab-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            background: transparent;
-            color: #888;
-            font-size: 14px;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .tab-btn.active {
-            background: #5c258d;
+        h1, h2, .brand-name, .btn-submit, .nav-login-btn { font-family: 'Poppins', sans-serif; }
+
+        /* Announcement bar */
+        .announce-bar {
+            background: linear-gradient(90deg, var(--purple-900), var(--purple-700));
             color: #fff;
-        }
-        
-        .form-group { 
-            margin-bottom: 22px; 
-        }
-        
-        .form-group label { 
-            display: block; 
-            margin-bottom: 8px; 
-            color: #BBB; 
-            font-size: 13px; 
-            font-weight: 500; 
-        }
-        
-        .form-group input { 
-            width: 100%; 
-            padding: 12px 45px 12px 16px; 
-            background: #222226; 
-            border: 1px solid #3A3A42; 
-            border-radius: 8px; 
-            color: white; 
-            font-size: 15px; 
-            outline: none; 
-        }
-        
-        .form-group input:focus { 
-            border-color: #ff66b2; 
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-wrapper input {
-            width: 100%;
-            padding: 12px 45px 12px 16px;
-            background: #222226;
-            border: 1px solid #3A3A42;
-            border-radius: 8px;
-            color: white;
-            font-size: 15px;
-            outline: none;
-        }
-
-        .input-wrapper input:focus {
-            border-color: #ff66b2;
-        }
-
-        .eye-toggle {
-            position: absolute;
-            right: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            font-size: 18px;
-            user-select: none;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-
-        .eye-toggle:hover {
-            opacity: 1;
-        }
-        
-        .btn-submit { 
-            width: 100%; 
-            padding: 14px; 
-            background: #5c258d; 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            font-size: 16px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: background 0.2s; 
-            margin-top: 10px; 
-            text-decoration: none; 
-            display: block; 
-            text-align: center; 
-        }
-        
-        .btn-submit:hover { 
-            background: #431966; 
-        }
-
-        .error-msg {
-            background: rgba(233, 30, 99, 0.15);
-            border: 1px solid #E91E63;
-            color: #ff66b2;
-            padding: 10px 14px;
-            border-radius: 8px;
+            text-align: center;
             font-size: 13px;
-            margin-bottom: 18px;
-            display: none;
+            font-weight: 500;
+            padding: 9px 16px;
+            letter-spacing: .2px;
+        }
+        .announce-bar span { margin: 0 6px; }
+
+        /* Top nav */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 5%; background: var(--white); border-bottom: 1px solid var(--lavender-200);
+            position: sticky; top: 0; z-index: 50;
+        }
+        .logo-container { display: flex; align-items: center; gap: 10px; }
+        .brand-mark { width: 40px; height: 40px; flex-shrink: 0; }
+        .logo-text h1 { font-size: 21px; color: var(--purple-700); font-weight: 700; line-height: 1.1; }
+        .logo-text span { font-size: 10px; color: var(--ink-soft); display: block; margin-top: 1px; }
+
+        nav ul { display: flex; list-style: none; gap: 32px; }
+        nav ul li a { text-decoration: none; color: #4A4458; font-size: 14px; font-weight: 500; transition: color .2s; }
+        nav ul li a:hover { color: var(--purple-700); }
+
+        .nav-login-btn {
+            background: linear-gradient(135deg, var(--purple-700), var(--purple-600));
+            color: #fff; padding: 10px 26px; border-radius: 10px; text-decoration: none;
+            font-size: 14px; font-weight: 600; box-shadow: 0 8px 18px rgba(124,58,237,0.28);
         }
 
-        .success-msg {
-            background: rgba(76, 175, 80, 0.15);
-            border: 1px solid #4CAF50;
-            color: #4CAF50;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-bottom: 18px;
-            display: none;
+        @media (max-width: 860px) { nav { display: none; } }
+
+        /* Page */
+        .page-wrap { display: flex; justify-content: center; align-items: center; padding: 60px 20px 70px; }
+
+        .auth-card {
+            background: var(--white); border-radius: 18px; width: 100%; max-width: 460px;
+            padding: 42px 44px; box-shadow: 0 20px 50px rgba(93,33,182,0.1); border: 1px solid var(--lavender-200);
         }
+
+        .auth-card h2 { font-size: 30px; font-weight: 800; text-align: center; margin-bottom: 26px; color: var(--ink); }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 13.5px; font-weight: 700; color: var(--ink); margin-bottom: 7px; }
+        .form-group label .opt { font-weight: 400; color: var(--ink-soft); font-size: 11.5px; }
+
+        .input-wrap { position: relative; display: flex; align-items: center; }
+        .input-wrap svg.leading { position: absolute; left: 14px; width: 17px; height: 17px; color: #8A80A3; pointer-events: none; }
+        .input-wrap input {
+            width: 100%; padding: 13px 44px 13px 42px; background: var(--white);
+            border: 1.5px solid var(--lavender-200); border-radius: 10px; color: var(--ink);
+            font-size: 14px; outline: none; transition: border-color .15s ease, box-shadow .15s ease;
+        }
+        .input-wrap input::placeholder { color: #A79CC0; }
+        .input-wrap input:focus { border-color: var(--purple-500); box-shadow: 0 0 0 4px rgba(147,51,234,0.1); }
+
+        .eye-toggle { position: absolute; right: 14px; cursor: pointer; color: #8A80A3; display: flex; }
+        .eye-toggle svg { width: 18px; height: 18px; }
+
+        .forgot-link { display: block; text-align: right; margin: -6px 0 18px; font-size: 12.5px; color: var(--purple-700); text-decoration: none; font-weight: 600; }
+        .forgot-link:hover { text-decoration: underline; }
+
+        .btn-submit {
+            width: 100%; padding: 15px; border: none; border-radius: 10px; cursor: pointer;
+            font-size: 15.5px; font-weight: 700; color: #fff;
+            background: linear-gradient(135deg, var(--purple-700), var(--purple-600));
+            box-shadow: 0 14px 28px rgba(124,58,237,0.3); transition: transform .15s ease;
+        }
+        .btn-submit:hover { transform: translateY(-1px); }
+
+        .divider { display: flex; align-items: center; gap: 14px; margin: 20px 0 16px; }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--lavender-200); }
+        .divider span { font-size: 11.5px; color: var(--ink-soft); font-weight: 600; letter-spacing: .3px; }
+
+        .switch-line { text-align: center; font-size: 13.5px; color: var(--ink-soft); }
+        .switch-line a { color: var(--purple-700); font-weight: 700; text-decoration: underline; cursor: pointer; }
+
+        .error-msg, .success-msg { padding: 11px 14px; border-radius: 9px; font-size: 13px; margin-bottom: 16px; display: none; font-weight: 500; }
+        .error-msg { background: rgba(228,67,122,0.08); border: 1px solid var(--danger); color: var(--danger); }
+        .success-msg { background: rgba(22,160,133,0.08); border: 1px solid var(--success); color: var(--success); }
 
         .panel { display: none; }
         .panel.active { display: block; }
 
         @media (max-width: 480px) {
-            .login-card {
-                padding: 30px 20px;
-                margin: 15px;
-                border-radius: 16px;
-            }
-            .logo-title h1 { font-size: 22px; }
-            .input-wrapper input { font-size: 16px; }
-            .form-group input { font-size: 16px; }
-            .btn-submit { font-size: 15px; padding: 15px; }
-            .tab-btn { font-size: 13px; padding: 10px 5px; }
+            .auth-card { padding: 30px 22px; border-radius: 14px; }
+            .auth-card h2 { font-size: 24px; }
+            header { padding: 12px 16px; }
+            .logo-text h1 { font-size: 18px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <div class="logo-title">
-            <h1>SafeHer Authentication</h1>
-            <p>Secure System Verification Layer</p>
-        </div>
+    <div class="announce-bar">A Safer Society <span>&middot;</span> A Brighter Tomorrow 💜</div>
 
-        <div class="tab-switcher">
-            <button class="tab-btn active" onclick="switchTab('login')">Login</button>
-            <button class="tab-btn" onclick="switchTab('register')">Create Account</button>
+    <header>
+        <div class="logo-container">
+            <svg class="brand-mark" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z" fill="url(#brandGrad)"/>
+                <circle cx="12" cy="9.3" r="2.3" fill="#fff"/>
+                <path d="M7.8 15.5c0-2.1 1.9-3.3 4.2-3.3s4.2 1.2 4.2 3.3" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/>
+                <defs><linearGradient id="brandGrad" x1="4" y1="2" x2="20" y2="22"><stop stop-color="#A855F7"/><stop offset="1" stop-color="#5B21B6"/></linearGradient></defs>
+            </svg>
+            <div class="logo-text">
+                <h1>SafeHer</h1>
+                <span>Safety. Support. Stronger Together.</span>
+            </div>
         </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="index.html#how-it-works-target">Services</a></li>
+                <li><a href="about.html">Contact</a></li>
+            </ul>
+        </nav>
+        <a href="login.html" class="nav-login-btn">Login</a>
+    </header>
 
-        <!-- LOGIN PANEL -->
-        <div class="panel active" id="panel-login">
-            <div class="error-msg" id="login-error"></div>
-            <div class="form-group">
-                <label>User Account Identifier (Email)</label>
-                <input type="email" id="email-input" placeholder="name@domain.com">
-            </div>
-            <div class="form-group">
-                <label>Security Access Code</label>
-                <div class="input-wrapper">
-                    <input type="password" id="password-input" placeholder="Your password">
-                    <span class="eye-toggle" onclick="togglePassword('password-input', 'eye1')" id="eye1">👁️</span>
-                </div>
-            </div>
-            <button class="btn-submit" onclick="handleAuthenticationSubmission()">Verify Identity & Proceed</button>
-        </div>
+    <div class="page-wrap">
+        <div class="auth-card">
 
-        <!-- REGISTER PANEL -->
-        <div class="panel" id="panel-register">
-            <div class="error-msg" id="register-error"></div>
-            <div class="success-msg" id="register-success"></div>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="reg-email" placeholder="name@domain.com">
-            </div>
-            <div class="form-group">
-                <label>Password <span style="color:#666; font-size:11px;">(min. 6 characters)</span></label>
-                <div class="input-wrapper">
-                    <input type="password" id="reg-password" placeholder="Create a strong password">
-                    <span class="eye-toggle" onclick="togglePassword('reg-password', 'eye2')" id="eye2">👁️</span>
+            <!-- LOGIN PANEL -->
+            <div class="panel active" id="panel-login">
+                <h2>Login</h2>
+                <div class="error-msg" id="login-error"></div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <div class="input-wrap">
+                        <svg class="leading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M2 7l10 6 10-6"></path></svg>
+                        <input type="email" id="email-input" placeholder="Enter your email">
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label>Confirm Password</label>
-                <div class="input-wrapper">
-                    <input type="password" id="reg-confirm" placeholder="Repeat your password">
-                    <span class="eye-toggle" onclick="togglePassword('reg-confirm', 'eye3')" id="eye3">👁️</span>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="input-wrap">
+                        <svg class="leading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="11" width="16" height="9" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+                        <input type="password" id="password-input" placeholder="Enter your password">
+                        <span class="eye-toggle" onclick="togglePassword('password-input', 'eye1')" id="eye1">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </span>
+                    </div>
                 </div>
+
+                <a href="#" class="forgot-link">Forgot Password?</a>
+
+                <button class="btn-submit" onclick="handleAuthenticationSubmission()">Login</button>
+
+                <div class="divider"><span>OR</span></div>
+                <p class="switch-line">Don't have an account? <a onclick="switchTab('register')">Register</a></p>
             </div>
-            <button class="btn-submit" onclick="handleRegistration()">Create Account & Continue</button>
+
+            <!-- REGISTER PANEL -->
+            <div class="panel" id="panel-register">
+                <h2>Register</h2>
+                <div class="error-msg" id="register-error"></div>
+                <div class="success-msg" id="register-success"></div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <div class="input-wrap">
+                        <svg class="leading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M2 7l10 6 10-6"></path></svg>
+                        <input type="email" id="reg-email" placeholder="Enter your email">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Password <span class="opt">(min. 6 characters)</span></label>
+                    <div class="input-wrap">
+                        <svg class="leading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="11" width="16" height="9" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+                        <input type="password" id="reg-password" placeholder="Create a password">
+                        <span class="eye-toggle" onclick="togglePassword('reg-password', 'eye2')" id="eye2">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <div class="input-wrap">
+                        <svg class="leading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="11" width="16" height="9" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+                        <input type="password" id="reg-confirm" placeholder="Confirm your password">
+                        <span class="eye-toggle" onclick="togglePassword('reg-confirm', 'eye3')" id="eye3">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </span>
+                    </div>
+                </div>
+
+                <button class="btn-submit" onclick="handleRegistration()">Register</button>
+
+                <div class="divider"><span>OR</span></div>
+                <p class="switch-line">Already have an account? <a onclick="switchTab('login')">Login</a></p>
+            </div>
+
         </div>
     </div>
 
     <script>
         function switchTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             document.getElementById('panel-' + tab).classList.add('active');
-            event.target.classList.add('active');
         }
 
         function togglePassword(inputId, eyeId) {
@@ -262,10 +242,10 @@
             const eye = document.getElementById(eyeId);
             if (input.type === 'password') {
                 input.type = 'text';
-                eye.innerText = '🙈';
+                eye.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.8 21.8 0 0 1 5.06-5.94M9.9 4.24A10.4 10.4 0 0 1 12 5c7 0 11 7 11 7a21.8 21.8 0 0 1-2.16 3.19m-6.2-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
             } else {
                 input.type = 'password';
-                eye.innerText = '👁️';
+                eye.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
             }
         }
 
@@ -296,7 +276,7 @@
                 });
 
                 const dataFeedbackResult = await queryResponse.json();
-                
+
                 if (dataFeedbackResult.success) {
                     localStorage.setItem('sheguard_userId', dataFeedbackResult.userId);
                     localStorage.setItem('sheguard_email', dataFeedbackResult.email);
