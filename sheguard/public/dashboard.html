@@ -3,583 +3,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHEGUARD - Dashboard</title>
+    <title>SafeHer - Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root{
-            --ink:#0B0F17;
-            --panel:#131A26;
-            --panel-2:#171F2D;
-            --panel-3:#10151F;
-            --line:#242E41;
-            --line-soft:#1B2435;
-            --paper:#E9ECF2;
-            --mist:#8A93AA;
-            --mist-dim:#5B6478;
-            --signal:#FFB23D;
-            --signal-dim:rgba(255,178,61,0.14);
-            --alert:#FF4F70;
-            --alert-dim:rgba(255,79,112,0.16);
-            --safe:#30D1A4;
+            --purple-900:#2D1B4E;
+            --purple-800:#3D2570;
+            --purple-700:#5B21B6;
+            --purple-600:#7C3AED;
+            --purple-500:#9333EA;
+            --violet-accent:#A855F7;
+            --lavender-50:#F7F4FE;
+            --lavender-100:#EFE9FC;
+            --lavender-200:#E1D6F8;
+            --ink:#241938;
+            --ink-soft:#6B6180;
+            --white:#FFFFFF;
+            --danger:#E4437A;
+            --success:#16A085;
+            --sidebar-ink:#1B1230;
         }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
-        body {
-            display: flex;
-            background-color: var(--ink);
-            height: 100vh;
-            overflow: hidden;
-        }
+        body { display: flex; background-color: var(--lavender-50); height: 100vh; overflow: hidden; }
 
-        .mono, #telemetry-coordinates-box, #terminal-stream-box, .beacon-label {
-            font-family: 'JetBrains Mono', ui-monospace, monospace;
-        }
-
-        .display-face, .brand-name, .sos-button, .emergency-header h2, h2#threat-modal-title, #dynamic-alert-headline {
-            font-family: 'Space Grotesk', sans-serif;
+        h1, h2, h3, h4, .brand-name, .emergency-header h2, .sos-button {
+            font-family: 'Poppins', sans-serif;
         }
 
         /* --- SIDEBAR --- */
         .sidebar {
-            width: 244px;
-            background-color: var(--panel-3);
+            width: 240px;
+            background-color: var(--sidebar-ink);
             display: flex;
             flex-direction: column;
-            padding: 26px 0 15px 0;
-            color: var(--mist);
-            border-right: 1px solid var(--line-soft);
+            padding: 28px 0 18px 0;
+            color: #ADA3C4;
             justify-content: space-between;
         }
 
-        .brand-container {
-            display: flex;
-            align-items: center;
-            gap: 11px;
-            margin-bottom: 30px;
-            padding: 0 22px;
-        }
+        .brand-container { display: flex; align-items: center; gap: 11px; margin-bottom: 30px; padding: 0 24px; }
+        .brand-mark { width: 34px; height: 34px; flex-shrink: 0; }
+        .brand-name { color: var(--white); font-size: 18px; font-weight: 700; letter-spacing: 0.2px; }
 
-        .brand-logo-placeholder {
-            width: 38px;
-            height: 38px;
-            background-color: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .brand-logo-placeholder img { width: 100%; height: 100%; object-fit: contain; }
-
-        .brand-name {
-            color: var(--paper);
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: 0.2px;
-        }
-
-        .menu-list {
-            list-style: none;
-            width: 100%;
-        }
+        .menu-list { list-style: none; width: 100%; padding: 0 14px; }
+        .menu-item { margin-bottom: 4px; }
 
         .menu-item a {
-            display: flex;
-            align-items: center;
-            padding: 11px 22px;
-            color: var(--mist);
-            text-decoration: none;
-            font-size: 13.5px;
-            font-weight: 500;
-            transition: color .15s ease, background-color .15s ease;
-            gap: 12px;
-            border-left: 2px solid transparent;
+            display: flex; align-items: center; padding: 11px 14px;
+            color: #ADA3C4; text-decoration: none; font-size: 13.5px; font-weight: 500;
+            transition: all 0.2s ease; gap: 12px; border-radius: 10px;
         }
-
-        .menu-item a svg { width: 16px; height: 16px; flex-shrink: 0; opacity: .8; }
+        .menu-item a svg { width: 17px; height: 17px; flex-shrink: 0; opacity: .85; }
 
         .menu-item.active a {
-            color: var(--paper);
-            background-color: var(--panel);
-            border-left: 2px solid var(--signal);
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--purple-700), var(--purple-600));
+            box-shadow: 0 6px 16px rgba(124,58,237,0.35);
         }
-        .menu-item.active a svg { opacity: 1; color: var(--signal); }
+        .menu-item a:hover { color: #ffffff; background-color: rgba(255,255,255,0.06); }
+        .menu-item.active a:hover { background: linear-gradient(135deg, var(--purple-700), var(--purple-600)); }
 
-        .menu-item a:hover {
-            color: var(--paper);
-            background-color: var(--panel);
-        }
-
-        /* Simulation deck */
-        .presenter-deck {
-            margin-top: auto;
-            border-top: 1px solid var(--line-soft);
-            padding: 16px 20px 0 20px;
-        }
-        .presenter-title {
-            font-size: 10.5px;
-            letter-spacing: 0.3px;
-            color: var(--mist-dim);
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
+        .presenter-deck { padding: 16px 14px 0 14px; border-top: 1px solid rgba(255,255,255,0.08); margin-top: 14px; }
+        .presenter-title { font-size: 10.5px; letter-spacing: 0.5px; text-transform: uppercase; color: #6B6180; margin-bottom: 10px; font-weight: 600; padding: 0 10px; }
         .sim-btn {
-            width: 100%;
-            background: var(--panel);
-            border: 1px solid var(--line);
-            padding: 10px 12px;
-            border-radius: 6px;
-            text-align: left;
-            color: var(--paper);
-            cursor: pointer;
-            margin-bottom: 8px;
-            font-size: 11px;
-            transition: border-color .15s ease;
+            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+            padding: 10px 12px; border-radius: 8px; text-align: left; color: #fff; cursor: pointer;
+            margin-bottom: 8px; font-size: 11px; transition: 0.2s;
         }
-        .sim-btn:hover { border-color: var(--signal); }
-        .sim-btn strong {
-            display: block;
-            color: var(--signal);
-            font-size: 12px;
-            margin-bottom: 2px;
-            font-weight: 600;
-            font-family: 'Space Grotesk', sans-serif;
-        }
-        .sim-btn span { color: var(--mist); }
+        .sim-btn:hover { border-color: var(--violet-accent); background: rgba(168,85,247,0.1); }
+        .sim-btn strong { display: block; color: var(--violet-accent); font-size: 12px; margin-bottom: 2px; font-weight: 600; }
+        .sim-btn span { color: #8A80A3; }
 
         /* --- MAIN WINDOW --- */
-        .main-window {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background-color: var(--ink);
-            position: relative;
-        }
+        .main-window { flex: 1; display: flex; flex-direction: column; background-color: var(--lavender-50); position: relative; }
 
         .top-accent-bar {
-            height: 40px;
-            background-color: var(--panel-3);
-            border-bottom: 1px solid var(--line-soft);
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 22px;
-            flex-shrink: 0;
+            height: 60px; background-color: var(--white); border-bottom: 1px solid var(--lavender-200);
+            width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; flex-shrink: 0;
         }
-
-        .system-status-pouch {
-            font-size: 12px;
-            color: var(--mist);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-family: 'Space Grotesk', sans-serif;
-            letter-spacing: .2px;
-        }
-
-        .status-dot-pulse {
-            width: 7px;
-            height: 7px;
-            background-color: var(--signal);
-            border-radius: 50%;
-            box-shadow: 0 0 0 3px var(--signal-dim);
-        }
-
-        .status-dot-pulse.alerted {
-            background-color: var(--alert);
-            box-shadow: 0 0 0 3px var(--alert-dim);
-            animation: dotBlink 1s ease-in-out infinite;
-        }
+        .system-status-pouch { font-size: 12.5px; color: var(--ink-soft); font-weight: 500; display: flex; align-items: center; gap: 8px; }
+        .status-dot-pulse { width: 7px; height: 7px; background-color: var(--success); border-radius: 50%; box-shadow: 0 0 0 3px rgba(22,160,133,0.18); }
+        .status-dot-pulse.alerted { background-color: var(--danger); box-shadow: 0 0 0 3px rgba(228,67,122,0.2); animation: dotBlink 1s ease-in-out infinite; }
         @keyframes dotBlink { 50% { opacity: .35; } }
 
         .profile-pic-placeholder {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background-color: var(--panel);
-            border: 1px solid var(--line);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            overflow: hidden;
+            width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-600), var(--violet-accent));
+            display: flex; align-items: center; justify-content: center; font-size: 13px; overflow: hidden; color: #fff;
         }
-
-        .profile-pic-placeholder img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-        }
-
-        .user-greeting {
-            font-size: 12px;
-            color: var(--paper);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 9px;
-        }
+        .profile-pic-placeholder img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .user-greeting { font-size: 13px; color: var(--ink); font-weight: 600; display: flex; align-items: center; gap: 10px; }
 
         /* Dashboard body */
-        .dashboard-body {
-            flex: 1;
-            padding: 26px 36px 15px 36px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-y: auto;
-            gap: 18px;
-        }
+        .dashboard-body { flex: 1; padding: 30px 40px 15px 40px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; overflow-y: auto; }
 
-        .emergency-header {
-            text-align: center;
-        }
+        .emergency-header { text-align: center; margin-bottom: 6px; }
+        .emergency-header h2 { color: var(--ink); font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+        .emergency-header p { color: var(--ink-soft); font-size: 13.5px; }
 
-        .emergency-header h2 {
-            color: var(--paper);
-            font-size: 27px;
-            font-weight: 600;
-            margin-bottom: 5px;
-            letter-spacing: -0.2px;
+        /* SOS button with ripple rings */
+        .sos-container { display: flex; justify-content: center; align-items: center; margin: 14px 0; }
+        .sos-ripple-outer {
+            width: 190px; height: 190px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, rgba(124,58,237,0.03) 70%, transparent 100%);
+            display: flex; align-items: center; justify-content: center; animation: breathe 3.2s ease-in-out infinite;
         }
-
-        .emergency-header p {
-            color: var(--mist);
-            font-size: 13px;
+        .sos-ripple-middle {
+            width: 152px; height: 152px; background-color: rgba(124,58,237,0.1); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
         }
-
-        /* --- SOS RADAR BEACON --- */
-        .sos-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 6px 0;
-            position: relative;
-        }
-
-        .radar-ring-outer {
-            width: 196px;
-            height: 196px;
-            border-radius: 50%;
-            border: 1px solid var(--line);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .radar-sweep {
-            position: absolute;
-            inset: 0;
-            border-radius: 50%;
-            background: conic-gradient(from 0deg, transparent 0deg, transparent 300deg, var(--signal-dim) 340deg, transparent 360deg);
-            animation: radarSpin 4s linear infinite;
-        }
-        @media (prefers-reduced-motion: reduce) { .radar-sweep { animation: none; } }
-
-        @keyframes radarSpin { to { transform: rotate(360deg); } }
-
-        .radar-ring-mid {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            border: 1px solid var(--line-soft);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.045); } }
 
         .sos-button {
-            width: 110px;
-            height: 110px;
-            background: var(--panel-2);
-            border: 2px solid var(--alert);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--alert);
-            font-size: 21px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            cursor: pointer;
-            user-select: none;
-            transition: .15s;
-            box-shadow: 0 0 0 0 var(--alert-dim);
-            z-index: 2;
+            width: 124px; height: 124px; border-radius: 50%;
+            background: linear-gradient(155deg, var(--purple-600) 0%, var(--purple-800) 100%);
+            display: flex; align-items: center; justify-content: center; color: #ffffff;
+            font-size: 24px; font-weight: 700; letter-spacing: 1px;
+            box-shadow: 0 10px 28px rgba(124,58,237,0.42), inset 0 1px 0 rgba(255,255,255,0.18);
+            cursor: pointer; user-select: none; transition: 0.2s;
         }
-        .sos-button:hover { background: var(--alert); color: var(--ink); box-shadow: 0 0 36px var(--alert-dim); }
         .sos-button:active { transform: scale(0.96); }
 
-        /* --- INSTRUMENT ROW (Audio + GPS) --- */
-        .instrument-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            width: 100%;
-            max-width: 1080px;
+        /* Cards */
+        .cards-grid { display: grid; grid-template-columns: 1.1fr 1.1fr 1.4fr 1.4fr; gap: 16px; width: 100%; max-width: 1140px; margin-top: auto; margin-bottom: 15px; }
+
+        .card {
+            background-color: var(--white); border-radius: 14px; padding: 16px 20px;
+            box-shadow: 0 4px 18px rgba(93,33,182,0.07); border: 1px solid var(--lavender-200); height: 185px; overflow: hidden;
         }
 
-        .instrument {
-            background: var(--panel);
-            border: 1px solid var(--line);
-            border-left: 3px solid var(--signal);
-            border-radius: 6px;
-            padding: 16px 18px;
-            cursor: pointer;
-            transition: border-color .15s ease;
-        }
-        .instrument:hover { border-color: var(--signal); }
+        .action-card { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; transition: border-color 0.2s, transform 0.2s; }
+        .action-card:hover { border-color: var(--violet-accent); transform: translateY(-2px); }
 
-        .instrument-label {
-            font-size: 11px;
-            color: var(--mist);
-            font-weight: 600;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 7px;
+        .action-icon-placeholder {
+            width: 52px; height: 52px; border-radius: 50%; margin-bottom: 12px; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, var(--purple-600), var(--violet-accent)); color: #fff;
         }
-        .instrument-label svg { width: 14px; height: 14px; color: var(--signal); flex-shrink: 0; }
-
-        .instrument-value {
-            font-size: 17px;
-            color: var(--paper);
-            font-weight: 600;
-        }
-        #telemetry-coordinates-box { font-size: 16px; letter-spacing: .2px; }
-
-        .instrument-sub { font-size: 11px; color: var(--mist-dim); margin-top: 4px; }
-
-        /* --- SAFE CIRCLE + LOG --- */
-        .lower-row {
-            display: grid;
-            grid-template-columns: 1fr 1.3fr;
-            gap: 14px;
-            width: 100%;
-            max-width: 1080px;
-            flex: 1;
-            min-height: 0;
-        }
-
-        .panel-card {
-            background: var(--panel);
-            border: 1px solid var(--line);
-            border-radius: 6px;
-            padding: 16px 18px;
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-        }
+        .action-icon-placeholder svg { width: 24px; height: 24px; }
+        .action-card h3 { color: var(--ink); font-size: 15.5px; font-weight: 600; margin-bottom: 4px; }
+        .action-card p { font-size: 12px; color: var(--ink-soft); word-break: break-word; padding: 0 5px; }
 
         .panel-card h4 {
-            color: var(--paper);
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            padding-bottom: 9px;
-            border-bottom: 1px solid var(--line-soft);
-            font-family: 'Space Grotesk', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            color: var(--ink); font-size: 14px; font-weight: 700; margin-bottom: 10px;
+            border-bottom: 1px solid var(--lavender-100); padding-bottom: 9px; font-family: 'Poppins', sans-serif;
+            display: flex; align-items: center; justify-content: space-between;
         }
-        .panel-card h4 span { font-size: 10.5px; color: var(--mist-dim); font-weight: 500; font-family: 'Inter', sans-serif; }
+        .panel-card h4 span { font-size: 11px; color: var(--ink-soft); font-weight: 500; background: var(--lavender-100); padding: 2px 9px; border-radius: 20px; }
 
-        .list-container-scroll {
-            flex: 1;
-            overflow-y: auto;
-            min-height: 90px;
-        }
+        .list-container-scroll { height: 130px; overflow-y: auto; }
 
-        .list-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--line-soft);
-        }
+        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--lavender-100); }
         .list-item:last-child { border-bottom: none; }
+        .item-left-profile { display: flex; align-items: center; gap: 10px; }
 
-        .item-left-profile { display: flex; align-items: center; gap: 11px; }
-
-        .priority-badge {
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            background: var(--signal-dim);
-            border: 1px solid var(--signal);
-            color: var(--signal);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: 700;
-            font-family: 'Space Grotesk', sans-serif;
-            flex-shrink: 0;
+        .avatar-placeholder {
+            width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; color: #fff; font-weight: 700; background: linear-gradient(135deg, var(--purple-500), var(--violet-accent)); flex-shrink: 0;
         }
 
-        .item-info h5 { color: var(--paper); font-size: 13px; font-weight: 500; }
-        .item-info p { color: var(--mist-dim); font-size: 10.5px; font-family: 'JetBrains Mono', monospace; }
+        .item-info h5 { color: var(--ink); font-size: 13px; font-weight: 600; }
+        .item-info p { color: var(--ink-soft); font-size: 10.5px; }
 
         .action-shortcut-icons { display: flex; gap: 6px; }
-        .mini-icon-btn-placeholder {
-            width: 23px; height: 23px; border-radius: 50%;
-            background-color: var(--line-soft);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px;
-        }
+        .mini-icon-btn-placeholder { width: 25px; height: 25px; border-radius: 50%; background-color: var(--lavender-100); color: var(--purple-700); display: flex; align-items: center; justify-content: center; font-size: 11px; }
 
-        /* Log strip: terminal */
-        .log-card {
-            background: var(--panel-3);
-            border-color: var(--line-soft);
-        }
-        #terminal-stream-box {
-            font-size: 11px;
-            color: var(--safe);
-            line-height: 1.6;
-            padding-right: 4px;
-        }
-
-        /* --- MODALS --- */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(6,9,15,0.78);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: var(--panel);
-            border: 1px solid var(--line);
-            border-radius: 10px;
-            width: 100%;
-            max-width: 460px;
-            padding: 30px;
-            border-top: 3px solid var(--signal);
-            text-align: center;
-            box-shadow: 0 30px 70px rgba(0,0,0,0.5);
-        }
-        #alert-border-style { border-top-color: var(--alert); }
-        .modal-content h2 { color: var(--paper); font-size: 21px; font-weight: 600; }
-        .modal-content > p { color: var(--mist); font-size: 13.5px; margin: 10px 0 4px; }
-        #countdown-ticker { color: var(--signal); font-size: 40px; font-weight: 700; margin: 10px 0; font-family: 'Space Grotesk', sans-serif; }
-
-        .popup-msg-box {
-            background: var(--panel-2);
-            border: 1px solid var(--line);
-            border-left: 3px solid var(--signal);
-            border-radius: 6px;
-            padding: 12px 14px;
-            text-align: left;
-            font-size: 12.5px;
-            margin-top: 12px;
-            color: var(--paper);
-            line-height: 1.5;
-        }
-        .popup-msg-box strong { font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; }
-
-        .btn-close-modal {
-            background: var(--signal);
-            color: var(--ink);
-            padding: 11px 26px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 20px;
-            font-weight: 700;
-            font-size: 13px;
-            font-family: 'Space Grotesk', sans-serif;
-        }
-        .btn-close-modal:hover { filter: brightness(1.08); }
-
-        /* Toast + side panel */
-        .safe-circle-toast {
-            display: none;
-            position: fixed;
-            top: 20px; left: 50%;
-            transform: translateX(-50%);
-            z-index: 2100;
-            background: var(--panel);
-            border: 1px solid var(--line);
-            color: var(--paper);
-            padding: 13px 20px;
-            border-radius: 8px;
-            box-shadow: 0 16px 36px rgba(0,0,0,0.4);
-            border-left: 3px solid var(--signal);
-            max-width: 420px;
-            width: calc(100% - 40px);
-            text-align: left;
-            font-size: 12.5px;
-            line-height: 1.5;
-        }
-        .safe-circle-toast strong { color: var(--signal); display: block; margin-bottom: 4px; font-size: 13px; font-family: 'Space Grotesk', sans-serif; }
-
-        .notified-side-panel {
-            display: none;
-            position: fixed;
-            top: 50%; right: 36px;
-            transform: translateY(-50%);
-            z-index: 2100;
-            background: var(--panel);
-            border: 1px solid var(--line);
-            color: var(--paper);
-            padding: 16px 20px;
-            border-radius: 8px;
-            box-shadow: 0 16px 36px rgba(0,0,0,0.4);
-            border-left: 3px solid var(--safe);
-            width: 220px;
-            font-size: 13px;
-        }
-        .notified-side-panel strong { color: var(--safe); display: block; margin-bottom: 10px; font-size: 13.5px; font-family: 'Space Grotesk', sans-serif; }
-        .notified-side-panel .notified-name { padding: 6px 0; border-bottom: 1px solid var(--line-soft); display: flex; align-items: center; gap: 8px; }
-        .notified-side-panel .notified-name:last-child { border-bottom: none; }
+        /* Activity log card (restyled "Recent History") */
+        .log-card .list-container-scroll { height: 130px; }
+        .log-entry { padding: 7px 0; border-bottom: 1px solid var(--lavender-100); font-size: 11.5px; color: var(--ink-soft); line-height: 1.45; }
+        .log-entry:last-child { border-bottom: none; }
+        .log-entry .log-time { color: var(--purple-600); font-weight: 600; margin-right: 4px; }
 
         /* --- BOTTOM NAV (mobile) --- */
         .bottom-nav {
-            display: none;
+            height: 56px; background-color: var(--sidebar-ink); border-top-left-radius: 20px; border-top-right-radius: 20px;
+            width: calc(100% - 40px); margin: 0 auto; display: flex; justify-content: center; align-items: center; gap: 40px;
         }
+        .bottom-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8A80A3; text-decoration: none; font-size: 10px; gap: 3px; }
+        .bottom-nav-item.active { color: var(--violet-accent); }
+        .bottom-nav-item svg { width: 17px; height: 17px; }
 
+        /* --- MODALS --- */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(36,25,56,0.6); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content {
+            background: var(--white); border-radius: 18px; width: 100%; max-width: 460px; padding: 32px;
+            border-top: 5px solid var(--purple-600); text-align: center; box-shadow: 0 24px 60px rgba(36,25,56,0.35);
+        }
+        #alert-border-style { border-top-color: var(--danger); }
+        .modal-content h2 { color: var(--ink); font-size: 22px; font-weight: 700; }
+        .modal-content > p { color: var(--ink-soft); font-size: 13.5px; margin: 10px 0 4px; }
+        #countdown-ticker { color: var(--purple-700); font-size: 40px; font-weight: 800; margin: 10px 0; font-family: 'Poppins', sans-serif; }
+
+        .popup-msg-box {
+            background: var(--lavender-50); border: 1px solid var(--lavender-200); border-left: 4px solid var(--purple-500);
+            border-radius: 10px; padding: 12px 14px; text-align: left; font-size: 12.5px; margin-top: 12px; color: var(--ink); line-height: 1.5;
+        }
+        .popup-msg-box strong { font-family: 'Poppins', sans-serif; font-size: 13px; }
+
+        .btn-close-modal {
+            background: linear-gradient(135deg, var(--purple-700), var(--purple-600)); color: #fff; padding: 12px 28px;
+            border: none; border-radius: 99px; cursor: pointer; margin-top: 20px; font-weight: 700; font-size: 13.5px;
+            box-shadow: 0 10px 24px rgba(124,58,237,0.3);
+        }
+        .btn-close-modal:hover { filter: brightness(1.05); }
+
+        /* Toast + side panel */
+        .safe-circle-toast {
+            display: none; position: fixed; top: 24px; left: 50%; transform: translateX(-50%); z-index: 2100;
+            background: var(--sidebar-ink); color: #ffffff; padding: 14px 22px; border-radius: 14px;
+            box-shadow: 0 14px 34px rgba(36,25,56,0.4); border-left: 4px solid var(--violet-accent);
+            max-width: 420px; width: calc(100% - 40px); text-align: left; font-size: 12.5px; line-height: 1.5;
+        }
+        .safe-circle-toast strong { color: var(--violet-accent); display: block; margin-bottom: 4px; font-size: 13.5px; font-weight: 700; }
+
+        .notified-side-panel {
+            display: none; position: fixed; top: 50%; right: 40px; transform: translateY(-50%); z-index: 2100;
+            background: var(--sidebar-ink); color: #ffffff; padding: 16px 20px; border-radius: 14px;
+            box-shadow: 0 14px 34px rgba(36,25,56,0.4); border-left: 4px solid var(--success); width: 220px; text-align: left; font-size: 13px;
+        }
+        .notified-side-panel strong { color: var(--success); display: block; margin-bottom: 10px; font-size: 14px; font-weight: 700; }
+        .notified-side-panel .notified-name { padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 8px; }
+        .notified-side-panel .notified-name:last-child { border-bottom: none; }
+
+        /* --- MOBILE --- */
         @media (max-width: 768px) {
             body { flex-direction: column; height: 100dvh; overflow: hidden; }
             .sidebar { display: none; }
+            .top-accent-bar { height: 52px; padding: 0 16px; }
             .main-window { width: 100%; height: 100dvh; flex: 1; }
-            .dashboard-body { padding: 16px 16px 72px 16px; gap: 14px; }
-            .emergency-header h2 { font-size: 20px; }
-            .radar-ring-outer { width: 164px; height: 164px; }
-            .radar-ring-mid { width: 126px; height: 126px; }
-            .sos-button { width: 92px; height: 92px; font-size: 17px; }
-            .instrument-row { grid-template-columns: 1fr 1fr; }
-            .lower-row { grid-template-columns: 1fr; }
-            .bottom-nav {
-                display: flex;
-                position: fixed; bottom: 0; left: 0;
-                height: 58px; width: 100%;
-                background: var(--panel-3);
-                border-top: 1px solid var(--line-soft);
-                justify-content: space-around;
-                align-items: center;
-                z-index: 100;
-            }
-            .bottom-nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--mist); text-decoration: none; font-size: 10px; }
-            .bottom-nav-item.active { color: var(--signal); }
-            .bottom-nav-item svg { width: 18px; height: 18px; }
-            .notified-side-panel { top: auto; bottom: 70px; right: 50%; transform: translateX(50%); width: calc(100% - 60px); max-width: 320px; }
+            .dashboard-body { padding: 16px 16px 10px 16px; overflow-y: auto; justify-content: flex-start; gap: 14px; }
+            .emergency-header h2 { font-size: 21px; margin-bottom: 4px; }
+            .emergency-header p { font-size: 12px; }
+            .sos-ripple-outer { width: 160px; height: 160px; }
+            .sos-ripple-middle { width: 130px; height: 130px; }
+            .sos-button { width: 105px; height: 105px; font-size: 20px; }
+            .sos-container { margin: 8px 0; }
+            .cards-grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+            .card { height: 150px; padding: 12px; }
+            .action-card h3 { font-size: 13px; }
+            .action-icon-placeholder { width: 42px; height: 42px; margin-bottom: 8px; }
+            .action-card p { font-size: 10px; }
+            .panel-card h4 { font-size: 12px; }
+            .list-container-scroll { height: 100px; }
+            .item-info h5 { font-size: 11px; }
+            .item-info p { font-size: 9px; }
+            .bottom-nav { width: 100%; border-radius: 0; height: 58px; gap: 0; justify-content: space-around; margin: 0; position: fixed; bottom: 0; left: 0; z-index: 100; }
+            .bottom-nav-item { font-size: 9px; flex: 1; padding: 4px 0; }
+            .modal-content { margin: 15px; padding: 22px; max-width: calc(100vw - 30px); }
+            .safe-circle-toast { top: 12px; padding: 12px 16px; font-size: 11.5px; }
+            .notified-side-panel { top: auto; bottom: 16px; right: 50%; transform: translateX(50%); width: calc(100% - 60px); max-width: 320px; }
         }
-
-        @media (max-width: 420px) {
-            .instrument-row { grid-template-columns: 1fr; }
+        @media (max-width: 380px) {
+            .cards-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .card { height: 130px; padding: 10px; }
+            .sos-ripple-outer { width: 140px; height: 140px; }
+            .sos-ripple-middle { width: 114px; height: 114px; }
+            .sos-button { width: 90px; height: 90px; font-size: 18px; }
+            .emergency-header h2 { font-size: 18px; }
         }
     </style>
 </head>
@@ -590,15 +270,19 @@
     <div id="init-interaction-modal" class="modal" style="display: flex;">
         <div class="modal-content">
             <h2>Turn on monitoring</h2>
-            <p>SheGuard needs microphone and location access to watch for distress keywords and track your position. Nothing is shared until you ask for help.</p>
-            <button class="btn-close-modal" style="width: 100%; margin-top: 10px; padding: 14px;" onclick="bootDashboardPipeline()">Start monitoring</button>
+            <p style="color:#555; font-size: 14px; margin-bottom: 15px;">SafeHer needs microphone and location access to watch for distress keywords and track your position. Nothing is shared until you ask for help.</p>
+            <button class="btn-close-modal" style="width: 100%; margin-top: 5px; padding: 14px;" onclick="bootDashboardPipeline()">Start Monitoring</button>
         </div>
     </div>
 
     <aside class="sidebar">
         <div>
             <div class="brand-container">
-                <div class="brand-logo-placeholder"><img src="main.png" alt="SafeHer"></div>
+                <svg class="brand-mark" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z" fill="url(#brandGrad)"/>
+                    <path d="M9 12.2l2 2 4-4.2" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs><linearGradient id="brandGrad" x1="4" y1="2" x2="20" y2="22"><stop stop-color="#A855F7"/><stop offset="1" stop-color="#5B21B6"/></linearGradient></defs>
+                </svg>
                 <div class="brand-name">SafeHer</div>
             </div>
             <ul class="menu-list">
@@ -610,6 +294,11 @@
                 <li class="menu-item">
                     <a href="contact-details.html">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Contacts
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="live-map.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Live Map
                     </a>
                 </li>
                 <li class="menu-item">
@@ -626,13 +315,13 @@
         </div>
 
         <div class="presenter-deck">
-            <div class="presenter-title">Simulation deck</div>
+            <div class="presenter-title">Simulation Deck</div>
             <button class="sim-btn" onclick="triggerVoiceSimulation()">
-                <strong>Mock voice trigger</strong>
+                <strong>Mock Voice Trigger</strong>
                 <span>Simulate saying "Help!"</span>
             </button>
             <button class="sim-btn" onclick="simulateStasisEvent()">
-                <strong>Force stasis alert</strong>
+                <strong>Force Stasis Alert</strong>
                 <span>Simulate 30s of no movement</span>
             </button>
         </div>
@@ -645,99 +334,93 @@
                 <span id="status-signal-text">AI Guard: Awaiting Activation</span>
             </div>
             <div class="user-greeting" id="user-greeting" style="display:none;">
-                <div class="profile-pic-placeholder" id="greeting-photo">👤</div>
                 <span id="greeting-name"></span>
+                <div class="profile-pic-placeholder" id="greeting-photo">👤</div>
             </div>
         </div>
 
         <div class="dashboard-body">
             <div class="emergency-header">
-                <h2>Are you in an emergency?</h2>
-                <p>Hold off for a false alarm, or press SOS and your Safe Circle is notified immediately.</p>
+                <h2>Are you in emergency?</h2>
+                <p>Press the SOS button below and help will reach you shortly.</p>
             </div>
 
             <div class="sos-container">
-                <div class="radar-ring-outer">
-                    <div class="radar-sweep"></div>
-                    <div class="radar-ring-mid">
+                <div class="sos-ripple-outer">
+                    <div class="sos-ripple-middle">
                         <div class="sos-button" onclick="fireEmergencyProtocol('Manual Screen SOS Interface Intervention')">SOS</div>
                     </div>
                 </div>
             </div>
 
-            <div class="instrument-row">
-                <div class="instrument" onclick="startContinuousSpeechRecognition()">
-                    <div class="instrument-label">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>
-                        Voice listener
-                    </div>
-                    <div class="instrument-value" id="audio-state-text">Awaiting alignment...</div>
-                    <div class="instrument-sub">Listens for "help" or "stop"</div>
+            <div class="cards-grid">
+
+                <div class="card action-card" onclick="startContinuousSpeechRecognition()">
+                    <div class="action-icon-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg></div>
+                    <h3>Voice Listener</h3>
+                    <p id="audio-state-text" style="color:#888; font-weight:500;">Awaiting alignment...</p>
                 </div>
 
-                <div class="instrument" onclick="window.location.href='live-map.html'">
-                    <div class="instrument-label">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        Live coordinates
-                    </div>
-                    <div class="instrument-value" id="telemetry-coordinates-box">Locating...</div>
-                    <div class="instrument-sub">Tap to open the roads map</div>
+                <div class="card action-card" onclick="window.location.href='live-map.html'">
+                    <div class="action-icon-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
+                    <h3>Live Location</h3>
+                    <p id="telemetry-coordinates-box" style="font-weight: 600; color: var(--ink);">Locating...</p>
                 </div>
-            </div>
 
-            <div class="lower-row">
-                <div class="panel-card">
+                <div class="card panel-card">
                     <h4>Safe Circle <span id="safe-circle-count"></span></h4>
                     <div class="list-container-scroll" id="safe-circle-list">
-                        <div style="color:var(--mist-dim); font-size:12px; text-align:center; margin-top:40px;">Loading contacts...</div>
+                        <div style="color:#aaa; font-size:12px; text-align:center; margin-top:40px;">Loading contacts...</div>
                     </div>
                 </div>
 
-                <div class="panel-card log-card">
-                    <h4>Execution stream <span>live</span></h4>
+                <div class="card panel-card log-card">
+                    <h4>Recent Activity <span>live</span></h4>
                     <div class="list-container-scroll" id="terminal-stream-box">
-                        [SYSTEM] Frame offline. Click the start-monitoring prompt...
+                        <div class="log-entry">Frame offline. Click the start-monitoring prompt...</div>
                     </div>
                 </div>
+
             </div>
 
             <nav class="bottom-nav">
-                <a href="index.html" class="bottom-nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path></svg>Home</a>
+                <a href="#" class="bottom-nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path></svg>Home</a>
                 <a href="live-map.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>Map</a>
+                <a href="contact-details.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>Circle</a>
             </nav>
         </div>
     </main>
 
     <div id="safe-circle-notice-toast" class="safe-circle-toast">
-        <strong>Notifying your Safe Circle</strong>
+        <strong>Notifying Your Safe Circle</strong>
         <span id="safe-circle-notice-text">Your trusted contacts will be alerted automatically when the timer reaches 0. Tap Stop to cancel.</span>
     </div>
 
     <div id="stasis-warning-modal" class="modal">
         <div class="modal-content">
-            <h2 id="threat-modal-title">Are you okay?</h2>
+            <h2 id="threat-modal-title">Are You Okay?</h2>
             <p id="threat-modal-desc">An alert will be sent to your Safe Circle in a few seconds unless you cancel.</p>
             <div id="countdown-ticker">10</div>
-            <button class="btn-close-modal" style="background:var(--alert); color:#fff;" onclick="dismissEmergencySystem()">I'm okay, cancel</button>
+            <button class="btn-close-modal" style="background:linear-gradient(135deg,#E4437A,#B23A5B);" onclick="dismissEmergencySystem()">I'm Okay, Cancel</button>
         </div>
     </div>
 
     <div id="emergency-alert-modal" class="modal">
         <div class="modal-content" id="alert-border-style">
-            <h2 id="dynamic-alert-headline">Alert sent</h2>
-            <p id="alert-reason-box" style="color: var(--mist); font-size:13px; margin-top:4px; margin-bottom: 10px;"></p>
+            <h2 id="dynamic-alert-headline">Alert Sent</h2>
+            <p id="alert-reason-box" style="color:#777; font-size:13px; margin-top:4px; margin-bottom: 10px;"></p>
 
             <div class="popup-msg-box">
-                <strong>Message sent</strong>
-                <span id="dynamic-sms-payload-text" style="color: var(--paper); display:block; margin-top:5px; font-weight:500;">Sending...</span>
+                <strong style="color:var(--ink);">Message sent</strong>
+                <span id="dynamic-sms-payload-text" style="color: var(--ink); display:block; margin-top:5px; font-weight:500;">Sending...</span>
             </div>
 
-            <div class="popup-msg-box" style="border-left-color: var(--safe);">
-                <strong style="color: var(--safe);">Calling now</strong><br>
+            <div class="popup-msg-box" style="border-left-color: var(--success);">
+                <strong style="color:var(--success);">Calling now</strong><br>
                 <span id="dynamic-call-payload-text">Trying to reach your Safe Circle by phone...</span>
             </div>
 
-            <button class="btn-close-modal" style="background:var(--safe); color:var(--ink);" onclick="dismissEmergencySystem()">I'm safe now</button>
+            <button class="btn-close-modal" style="background:linear-gradient(135deg,#16A085,#0E7A66);" onclick="dismissEmergencySystem()">I'm Safe Now</button>
         </div>
     </div>
 
@@ -790,7 +473,10 @@
         function appendLogMessage(msg) {
             const displayBox = document.getElementById('terminal-stream-box');
             const stamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-            displayBox.innerHTML += `<br>[${stamp}] ${msg}`;
+            const row = document.createElement('div');
+            row.className = 'log-entry';
+            row.innerHTML = `<span class="log-time">${stamp}</span>${msg}`;
+            displayBox.appendChild(row);
             displayBox.scrollTop = displayBox.scrollHeight;
         }
 
@@ -860,7 +546,7 @@
                 const contact = safeCircleContacts[callEscalationIndex];
                 const label = contact.relationship ? `${contact.name} (${contact.relationship})` : contact.name;
                 callBox.innerHTML = `Calling <strong>${label}</strong>...`;
-                appendLogMessage(`[CALL]: Dialing ${label} — Priority ${callEscalationIndex + 1}.`);
+                appendLogMessage(`Dialing ${label} — Priority ${callEscalationIndex + 1}.`);
             }
 
             attemptCall();
@@ -870,7 +556,7 @@
                 callEscalationTimer = setInterval(() => {
                     const missedContact = safeCircleContacts[callEscalationIndex];
                     const missedLabel = missedContact.relationship ? `${missedContact.name} (${missedContact.relationship})` : missedContact.name;
-                    appendLogMessage(`[CALL]: No answer from ${missedLabel}. Escalating to next priority.`);
+                    appendLogMessage(`No answer from ${missedLabel}. Escalating to next priority.`);
 
                     callEscalationIndex = (callEscalationIndex + 1) % safeCircleContacts.length;
                     attemptCall();
@@ -897,10 +583,11 @@
                     countEl.innerText = result.contacts.length;
                     listEl.innerHTML = '';
                     result.contacts.forEach((c, i) => {
+                        const initial = (c.name || '?').trim().charAt(0).toUpperCase();
                         listEl.innerHTML += `
                             <div class="list-item">
                                 <div class="item-left-profile">
-                                    <div class="priority-badge">${i + 1}</div>
+                                    <div class="avatar-placeholder">${initial}</div>
                                     <div class="item-info">
                                         <h5>${c.name}${c.relationship ? ' (' + c.relationship + ')' : ''}</h5>
                                         <p>${c.phone}</p>
@@ -913,14 +600,14 @@
                             </div>
                         `;
                     });
-                    appendLogMessage(`[SERVER SYNC]: Loaded ${result.contacts.length} verified contacts from database.`);
+                    appendLogMessage(`Loaded ${result.contacts.length} verified contacts from database.`);
                 } else {
                     safeCircleContacts = []; // NEW
-                    listEl.innerHTML = '<div style="color:var(--mist-dim); font-size:12px; text-align:center; margin-top:30px; padding:0 10px;">No contacts saved yet.<br><a href="contact-details.html" style="color:var(--signal);">Add contacts →</a></div>';
-                    appendLogMessage('[SERVER SYNC]: No contacts found in database for this user.');
+                    listEl.innerHTML = '<div style="color:#aaa; font-size:12px; text-align:center; margin-top:30px; padding:0 10px;">No contacts saved yet.<br><a href="contact-details.html" style="color:var(--purple-600);">Add contacts →</a></div>';
+                    appendLogMessage('No contacts found in database for this user.');
                 }
             } catch (err) {
-                appendLogMessage('[SERVER ERROR]: Failed to load contacts from database.');
+                appendLogMessage('Failed to load contacts from database.');
             }
         }
 
@@ -930,9 +617,11 @@
 
             document.getElementById('status-signal-text').innerText = "AI Guard: Active & Monitoring";
             document.getElementById('audio-state-text').innerText = "Listening for vocal anchors";
+            document.getElementById('audio-state-text').style.color = "#16A085";
 
-            const displayBox = document.getElementById('terminal-stream-box');
-            displayBox.innerHTML = "[SYSTEM] Initial frameworks bound.<br>[SYSTEM] Interaction established. Audio stream tokens unlocked.";
+            document.getElementById('terminal-stream-box').innerHTML = '';
+            appendLogMessage("Initial frameworks bound.");
+            appendLogMessage("Interaction established. Audio stream tokens unlocked.");
 
             // Load real contacts from DB inside boot sequence
             await loadSafetyCircleFromDatabase();
@@ -948,6 +637,7 @@
             if (!window.SpeechRecognition) {
                 appendLogMessage("Acoustic Error: Speech Recognition API not supported natively on this browser context.");
                 document.getElementById('audio-state-text').innerText = "Microphone Module Error";
+                document.getElementById('audio-state-text').style.color = "#B23A5B";
                 return;
             }
 
@@ -993,7 +683,7 @@
             const siren = document.getElementById('emergency-siren');
             siren.play().catch(e => console.log("Audio pipeline stream blocked."));
 
-            document.getElementById('threat-modal-title').innerText = `We heard "${matchedPhrase}"`;
+            document.getElementById('threat-modal-title').innerText = `We Heard "${matchedPhrase}"`;
             document.getElementById('threat-modal-desc').innerText = `We think you might need help. An alert will be sent to your Safe Circle in a few seconds unless you cancel.`;
             document.getElementById('stasis-warning-modal').style.display = 'flex';
             showSafeCircleNotice(); // NEW: show the notice alongside the grace-period modal
@@ -1077,12 +767,12 @@
         }
 
         function initiateStasisEscalation() {
-            appendLogMessage("CRITICAL: Location stasis tracking crossed 30s limit!");
+            appendLogMessage("🚨 CRITICAL: Location stasis tracking crossed 30s limit!");
 
             const siren = document.getElementById('emergency-siren');
             siren.play().catch(e => console.log("Audio asset intercept blocked."));
 
-            document.getElementById('threat-modal-title').innerText = "No movement detected";
+            document.getElementById('threat-modal-title').innerText = "No Movement Detected";
             document.getElementById('threat-modal-desc').innerText = "You haven't moved in over 30 seconds. An alert will be sent to your Safe Circle in a few seconds unless you cancel.";
             document.getElementById('stasis-warning-modal').style.display = 'flex';
             showSafeCircleNotice(); // NEW: show the notice alongside the grace-period modal
@@ -1130,26 +820,26 @@
             const smsBox = document.getElementById('dynamic-sms-payload-text');
 
             if (cause.includes("Vocal") || cause.includes("Distress") || cause.includes("HELP")) {
-                headline.innerHTML = "Voice alert sent";
+                headline.innerHTML = "🗣️ Voice Alert Sent";
                 reasonBox.innerText = "We heard a distress word and sent this alert automatically.";
-                smsBox.innerHTML = `We heard you say "help" or "stop" and shared your live location: <a href="${liveMapUrl}" target="_blank" style="color: var(--signal);">${liveMapUrl}</a>`;
+                smsBox.innerHTML = `We heard you say "help" or "stop" and shared your live location: <a href="${liveMapUrl}" target="_blank" style="color: var(--purple-600);">${liveMapUrl}</a>`;
 
             } else if (cause.includes("Timeout") || cause.includes("Static") || cause.includes("Immobility")) {
-                headline.innerHTML = "Location alert sent";
+                headline.innerHTML = "📍 Location Alert Sent";
                 reasonBox.innerText = "We noticed you haven't moved in over 30 seconds.";
-                smsBox.innerHTML = `No movement detected for 30+ seconds. Your live location: <a href="${liveMapUrl}" target="_blank" style="color: var(--signal);">${liveMapUrl}</a>`;
+                smsBox.innerHTML = `No movement detected for 30+ seconds. Your live location: <a href="${liveMapUrl}" target="_blank" style="color: var(--purple-600);">${liveMapUrl}</a>`;
 
             } else {
-                headline.innerHTML = "SOS alert sent";
+                headline.innerHTML = "🚨 SOS Alert Sent";
                 reasonBox.innerText = "You pressed the SOS button.";
-                smsBox.innerHTML = `Your live location has been shared: <a href="${liveMapUrl}" target="_blank" style="color: var(--signal);">${liveMapUrl}</a>`;
+                smsBox.innerHTML = `Your live location has been shared: <a href="${liveMapUrl}" target="_blank" style="color: var(--purple-600);">${liveMapUrl}</a>`;
             }
 
             document.getElementById('emergency-alert-modal').style.display = 'flex';
             showNotifiedPanel(); // NEW: show who was notified, separately, beside the modal
             startCallEscalation(); // NEW: simulate calling contacts one at a time, in priority order
             sendRealAlerts(cause, liveMapUrl); // sends real SMS (Fast2SMS) with a live tracking link
-            appendLogMessage(`[BROADCAST DISPATCH]: ${headline.innerText} sent successfully.`);
+            appendLogMessage(`${headline.innerText} sent successfully.`);
         }
 
         // NEW: sends a real SMS alert (Fast2SMS) via the backend to Safe Circle contacts
@@ -1176,15 +866,15 @@
                     startLiveTracking(result.token);
                     const smsBox = document.getElementById('dynamic-sms-payload-text');
                     if (smsBox && result.trackUrl) {
-                        smsBox.innerHTML = `Your live location is being shared: <a href="${result.trackUrl}" target="_blank" style="color: var(--signal);">${result.trackUrl}</a>`;
+                        smsBox.innerHTML = `Your live location is being shared: <a href="${result.trackUrl}" target="_blank" style="color: var(--purple-600);">${result.trackUrl}</a>`;
                     }
                 }
 
                 // SMS results
                 if (result.sms.total === 0) {
-                    appendLogMessage(`[SMS]: No contacts have a phone number saved — no texts sent.`);
+                    appendLogMessage(`No contacts have a phone number saved — no texts sent.`);
                 } else if (result.sms.sent > 0) {
-                    appendLogMessage(`[SMS]: Sent ${result.sms.sent} of ${result.sms.total} alert text(s).`);
+                    appendLogMessage(`Sent ${result.sms.sent} of ${result.sms.total} alert text(s).`);
                 } else {
                     appendLogMessage(`[SMS ERROR]: ${result.sms.error || 'Unknown error.'}`);
                 }
@@ -1192,9 +882,9 @@
                 // Real voice call result (to top-priority contact only)
                 if (result.call) {
                     if (result.call.placed) {
-                        appendLogMessage(`[REAL CALL]: Placing an actual phone call to ${result.call.to}.`);
+                        appendLogMessage(`Placing an actual phone call to ${result.call.to}.`);
                     } else {
-                        appendLogMessage(`[REAL CALL ERROR]: ${result.call.error || 'Could not place the call.'}`);
+                        appendLogMessage(`[CALL ERROR]: ${result.call.error || 'Could not place the call.'}`);
                     }
                 }
             } catch (err) {
@@ -1206,7 +896,7 @@
         function startLiveTracking(token) {
             stopLiveTracking(false);
             trackToken = token;
-            appendLogMessage('[LIVE TRACKING]: Sharing live location with your Safe Circle.');
+            appendLogMessage('Sharing live location with your Safe Circle.');
             const push = () => {
                 if (!trackToken || !currentPos) return;
                 fetch('/api/alert/update', {
@@ -1226,7 +916,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ token: trackToken })
                 }).catch(() => {});
-                appendLogMessage('[LIVE TRACKING]: Location sharing stopped.');
+                appendLogMessage('Location sharing stopped.');
             }
             trackToken = null;
         }
@@ -1248,9 +938,10 @@
             document.getElementById('status-signal-dot').className = "status-dot-pulse";
             document.getElementById('status-signal-text').innerText = "AI Guard: Active & Monitoring";
             document.getElementById('audio-state-text').innerText = "Listening for vocal anchors";
+            document.getElementById('audio-state-text').style.color = "#16A085";
 
             stationarySecondsCount = 0;
-            appendLogMessage("[PIPELINE RESET]: Reset algorithms context layout back to baseline.");
+            appendLogMessage("Reset algorithms context layout back to baseline.");
 
             if (stasisEvaluationLoop) clearInterval(stasisEvaluationLoop);
             stasisEvaluationLoop = setInterval(evaluateStasisMetrics, 1000);
@@ -1260,6 +951,7 @@
 
         function triggerVoiceSimulation() {
             document.getElementById('audio-state-text').innerText = "Matched Command: 'HELP!'";
+            document.getElementById('audio-state-text').style.color = "#B23A5B";
             appendLogMessage("Simulation Deck: Injecting mock voice event string frame validation logic.");
             fireEmergencyProtocol("Vocal Trigger Pattern Event Match");
         }
