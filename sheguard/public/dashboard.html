@@ -44,7 +44,7 @@
         }
 
         .brand-container { display: flex; align-items: center; gap: 11px; margin-bottom: 30px; padding: 0 24px; }
-        .brand-mark { width: 34px; height: 34px; flex-shrink: 0; }
+        .brand-mark { width: 34px; height: 34px; flex-shrink: 0; border-radius: 8px; object-fit: contain; }
         .brand-name { color: var(--white); font-size: 18px; font-weight: 700; letter-spacing: 0.2px; }
 
         .menu-list { list-style: none; width: 100%; padding: 0 14px; }
@@ -278,11 +278,7 @@
     <aside class="sidebar">
         <div>
             <div class="brand-container">
-                <svg class="brand-mark" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z" fill="url(#brandGrad)"/>
-                    <path d="M9 12.2l2 2 4-4.2" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                    <defs><linearGradient id="brandGrad" x1="4" y1="2" x2="20" y2="22"><stop stop-color="#A855F7"/><stop offset="1" stop-color="#5B21B6"/></linearGradient></defs>
-                </svg>
+                <img class="brand-mark" src="main.png" alt="SafeHer Logo">
                 <div class="brand-name">SafeHer</div>
             </div>
             <ul class="menu-list">
