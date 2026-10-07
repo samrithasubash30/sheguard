@@ -323,6 +323,7 @@ app.post('/api/emergency/notify', async (req, res) => {
             trackUrl: mapUrl || null,
             sms: { sent: smsSentCount, total: phoneContacts.length, error: smsSentCount === 0 ? smsLastError : null },
             call: callStatus,
+            topContact: topContact ? { name: topContact.name, phone: topContact.phone } : null,
         });
     } catch (err) {
         console.error('Emergency notify error:', err);

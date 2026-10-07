@@ -1282,6 +1282,22 @@
                         appendLogMessage(`[REAL CALL ERROR]: ${result.call.error || 'Could not place the call.'}`);
                     }
                 }
+
+                // One-tap call button: the phone's own dialer calls the top contact (works with no paid service)
+                if (result.topContact && result.topContact.phone) {
+                    const digits = result.topContact.phone.replace(/[^0-9]/g, '');
+                    const dial = digits.length === 10 ? '+91' + digits : '+' + digits;
+                    let btn = document.getElementById('call-contact-btn');
+                    if (!btn) {
+                        btn = document.createElement('a');
+                        btn.id = 'call-contact-btn';
+                        btn.style.cssText = 'position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:99999;background:#2e9d4f;color:#fff;padding:14px 26px;border-radius:30px;font-weight:700;font-size:16px;text-decoration:none;box-shadow:0 6px 20px rgba(0,0,0,.4)';
+                        document.body.appendChild(btn);
+                    }
+                    btn.href = 'tel:' + dial;
+                    btn.textContent = '\uD83D\uDCDE Call ' + result.topContact.name;
+                    appendLogMessage(`[CALL BUTTON]: Tap to call ${result.topContact.name} now.`);
+                }
             } catch (err) {
                 appendLogMessage('[ALERT ERROR]: Could not reach the server to send alerts.');
             }
@@ -1317,6 +1333,7 @@
         }
 
         function dismissEmergencySystem() {
+            const cb = document.getElementById('call-contact-btn'); if (cb) cb.remove();
             stopLiveTracking(true);
             isEmergencyTriggered = false;
             clearInterval(counterClock);
