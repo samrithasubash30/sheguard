@@ -243,8 +243,25 @@ app.post('/api/emergency/notify', async (req, res) => {
             [userId]
         );
 
-        const locationLine = mapUrl ? `\n\nTrack live: ${mapUrl}` : '';
-        const reasonLine = cause ? `\n\nReason: ${cause}` : '';
+        // ── Build the SMS text so it fits in ONE 160-character segment ──────────
+        // Fast2SMS bills per segment (Rs 5 each). Anything over 160 characters is
+        // split into 2 SMS and billed twice, so the reason is NOT included here
+        // (it is still spoken on the voice call and shown on the dashboard).
+        // Keep this text plain ASCII: emojis / non-English letters cut the limit to 70.
+        const SMS_LIMIT = 160;
+        const shortName = String(userName).trim().slice(0, 25);
+        let smsText = mapUrl
+            ? `SafeHer Alert: ${shortName} may need help. Track live: ${mapUrl}`
+            : `SafeHer Alert: ${shortName} may need help. Please call them now.`;
+        if (smsText.length > SMS_LIMIT) {
+            // Very long tracking link or name: fall back to the most compact form
+            smsText = mapUrl
+                ? `SafeHer: ${shortName} needs help. ${mapUrl}`
+                : `SafeHer: ${shortName} needs help. Call now.`;
+        }
+        if (smsText.length > SMS_LIMIT) {
+            smsText = smsText.slice(0, SMS_LIMIT);
+        }
 
         // ── SMS (Fast2SMS — Quick SMS route, no DLT registration needed) ───────
         const phoneContacts = contactsResult.rows.filter(c => c.phone && c.phone.trim() !== '');
@@ -254,7 +271,6 @@ app.post('/api/emergency/notify', async (req, res) => {
         if (!process.env.FAST2SMS_API_KEY) {
             smsLastError = 'FAST2SMS_API_KEY is not set on the server.';
         } else {
-            const smsText = `SafeHer Alert: ${userName} may need help.${reasonLine}${locationLine}`;
             for (const contact of phoneContacts) {
                 // Fast2SMS Quick SMS route expects plain 10-digit Indian numbers (no +91 prefix)
                 const plainNumber = contact.phone.replace(/[^0-9]/g, '').slice(-10);
